@@ -1,3 +1,3 @@
 # Scrumban-Management-System
 
-A seamless and easy to use scrum management system with integarted To-do List, Kanban board and Scrum Dashboard.
+A seamless and easy to use scrum management system with integrated To-do List, Kanban board and Scrum Dashboard.
