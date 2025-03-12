@@ -1,10 +1,11 @@
 import { Outlet } from "react-router-dom";
-import ToDoSidebar from "./components/todo_list/ToDoSidebar";
+import NavigationBar from "./components/NavigationBar";
 
 export default function App() {
     return (
-      <>
-        <Outlet />
-      </>
+      <div className="flex lg:flex-row w-full h-full">
+          <NavigationBar />
+          <Outlet />
+      </div>
     );
 }

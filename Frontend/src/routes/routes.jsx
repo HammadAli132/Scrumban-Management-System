@@ -20,6 +20,10 @@ const routes = [
                 path: "/to-do-list",
                 element: <ToDo />,
             },
+            {
+                path: "/kanban-board",
+                element: <ToDo />,
+            },
         ],
     },
 ];
