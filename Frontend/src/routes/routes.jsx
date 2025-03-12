@@ -1,6 +1,7 @@
 import App from "../App.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import Login from "../pages/Login.jsx";
+import ToDo from "../pages/ToDo.jsx";
 
 const routes = [
     {
@@ -14,6 +15,10 @@ const routes = [
             {
                 path: "/login",
                 element: <Login />,
+            },
+            {
+                path: "/to-do-list",
+                element: <ToDo />,
             },
         ],
     },
