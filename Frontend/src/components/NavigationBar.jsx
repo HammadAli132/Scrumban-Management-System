@@ -37,7 +37,7 @@ export default function NavigationBar() {
 
             {/* Bottom group => Notification Icon, More Icon */}
             <div className="flex lg:flex-col flex-row justify-between items-center gap-5 mb-5">
-                {Icons.slice(3).map((Icon, index) => (
+                {/* {Icons.slice(3).map((Icon, index) => (
                     <div key={index} className="cursor-pointer hover:bg-[#2f2f2f] rounded-lg p-1">
                         <Icon
                             size={25}
@@ -45,8 +45,8 @@ export default function NavigationBar() {
                             onClick={() => setActiveIcon(index + 3)}
                         />  
                     </div>
-                ))}
-                {/* {Icons.slice(3).map((Icon, index) => (
+                ))} */}
+                {Icons.slice(3).map((Icon, index) => (
                     <Link
                         key={index}
                         to={index === 0 ? '/notifications' : '/about-us'} // Change these paths as needed
@@ -55,7 +55,7 @@ export default function NavigationBar() {
                     >
                         <Icon size={25} color={activeIcon === (index + 3) ? '#fff' : '#a7a7a7'} />
                     </Link>
-                ))} */}
+                ))}
             </div>
         </div>
     )
