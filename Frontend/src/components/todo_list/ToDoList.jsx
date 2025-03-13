@@ -8,7 +8,7 @@ import {
     FlagTriangleRight
 } from 'lucide-react';
 
-const TodoListItem = ({ todo }) => {
+const TodoListItem = ({ todo, onSelect }) => {
 
     const getPriorityColor = (priority) => {
         switch (priority) {
@@ -50,9 +50,7 @@ const TodoListItem = ({ todo }) => {
                 <input
                     type="checkbox"
                     checked={todo.completed}
-                    onChange={() => setTodos(todos.map(t =>
-                        t.id === todo.id ? { ...t, completed: !t.completed } : t
-                    ))}
+                    onChange={() => onSelect(todo.id)}
                     className={`w-5 h-5 rounded-sm appearance-none border-2 ${getPriorityColor(todo.priority)} 
                   checked:bg-current checked:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-offset-[#1a1a1a] transition-colors cursor-pointer`}
                 />
@@ -70,7 +68,7 @@ const TodoListItem = ({ todo }) => {
                     </svg>
                 )}
             </div>
-            <span className={`flex-1 ${todo.completed ? 'line-through text-gray-500' : ''}`}>
+            <span className={`flex-1 font-normal text-sm ${todo.completed ? 'line-through text-gray-500' : ''}`}>
                 {todo.title}
             </span>
             {todo.dueDate && (
@@ -113,6 +111,12 @@ function ToDoList() {
     const [selectedPriority, setSelectedPriority] = useState(null);
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedTime, setSelectedTime] = useState("");
+
+    const handleSelectTodoCheckbox = (id) => {
+        setTodos(todos.map(t =>
+            t.id === id ? { ...t, completed: !t.completed } : t
+        ))
+    }
 
     const handleAddTodo = () => {
         if (newTodo.trim()) {
@@ -213,7 +217,7 @@ function ToDoList() {
             {/* Todo List */}
             <div className="flex-1 overflow-y-auto">
                 {todos.map(todo => (
-                    <TodoListItem todo={todo} />
+                    <TodoListItem todo={todo} onSelect={handleSelectTodoCheckbox}/>
                 ))}
             </div>
         </div>
