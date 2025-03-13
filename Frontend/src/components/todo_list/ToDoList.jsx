@@ -4,8 +4,7 @@ import {
     Calendar,
     Clock,
     Flag,
-    Plus,
-    FlagTriangleRight
+    Plus
 } from 'lucide-react';
 
 const TodoListItem = ({ todo, onSelect }) => {
