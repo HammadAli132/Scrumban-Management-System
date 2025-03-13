@@ -8,30 +8,7 @@ import {
     FlagTriangleRight
 } from 'lucide-react';
 
-
-function App() {
-    const [todos, setTodos] = useState([
-        {
-            id: 1,
-            title: "Complete project documentation",
-            completed: false,
-            priority: "high",
-            dueDate: "2024-03-15",
-            reminderTime: "14:00"
-        },
-        {
-            id: 2,
-            title: "Review pull requests",
-            completed: false,
-            priority: "medium",
-            dueDate: "2024-03-14",
-            reminderTime: null
-        }
-    ]);
-    const [newTodo, setNewTodo] = useState("");
-    const [selectedPriority, setSelectedPriority] = useState(null);
-    const [selectedDate, setSelectedDate] = useState("");
-    const [selectedTime, setSelectedTime] = useState("");
+const TodoListItem = ({ todo }) => {
 
     const getPriorityColor = (priority) => {
         switch (priority) {
@@ -62,6 +39,80 @@ function App() {
             hour12: true
         });
     };
+
+
+    return (
+        <div
+            key={todo.id}
+            className="flex items-center gap-4 p-4 border-b border-[#2e2d2d] hover:bg-[#2e2d2d] group transition-colors"
+        >
+            <div className="relative">
+                <input
+                    type="checkbox"
+                    checked={todo.completed}
+                    onChange={() => setTodos(todos.map(t =>
+                        t.id === todo.id ? { ...t, completed: !t.completed } : t
+                    ))}
+                    className={`w-5 h-5 rounded-sm appearance-none border-2 ${getPriorityColor(todo.priority)} 
+                  checked:bg-current checked:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-offset-[#1a1a1a] transition-colors cursor-pointer`}
+                />
+                {todo.completed && (
+                    <svg
+                        className="absolute top-0.5 left-0.5 w-4 h-4 text-[#1a1a1a] pointer-events-none"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                )}
+            </div>
+            <span className={`flex-1 ${todo.completed ? 'line-through text-gray-500' : ''}`}>
+                {todo.title}
+            </span>
+            {todo.dueDate && (
+                <div className="text-right">
+                    <div className="font-bold text-sm text-gray-300">
+                        {formatDate(todo.dueDate)}
+                    </div>
+                    {todo.reminderTime && (
+                        <div className="text-xs text-gray-400">
+                            {formatTime(todo.reminderTime)}
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    )
+}
+
+
+function ToDoList() {
+    const [todos, setTodos] = useState([
+        {
+            id: 1,
+            title: "Complete project documentation",
+            completed: false,
+            priority: "high",
+            dueDate: "2024-03-15",
+            reminderTime: "14:00"
+        },
+        {
+            id: 2,
+            title: "Review pull requests",
+            completed: false,
+            priority: "medium",
+            dueDate: "2024-03-14",
+            reminderTime: null
+        }
+    ]);
+    const [newTodo, setNewTodo] = useState("");
+    const [selectedPriority, setSelectedPriority] = useState(null);
+    const [selectedDate, setSelectedDate] = useState("");
+    const [selectedTime, setSelectedTime] = useState("");
 
     const handleAddTodo = () => {
         if (newTodo.trim()) {
@@ -162,54 +213,11 @@ function App() {
             {/* Todo List */}
             <div className="flex-1 overflow-y-auto">
                 {todos.map(todo => (
-                    <div
-                        key={todo.id}
-                        className="flex items-center gap-4 p-4 border-b border-[#2e2d2d] hover:bg-[#2e2d2d] group transition-colors"
-                    >
-                        <div className="relative">
-                            <input
-                                type="checkbox"
-                                checked={todo.completed}
-                                onChange={() => setTodos(todos.map(t =>
-                                    t.id === todo.id ? { ...t, completed: !t.completed } : t
-                                ))}
-                                className={`w-5 h-5 rounded-sm appearance-none border-2 ${getPriorityColor(todo.priority)} 
-                  checked:bg-current checked:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-offset-[#1a1a1a] transition-colors cursor-pointer`}
-                            />
-                            {todo.completed && (
-                                <svg
-                                    className="absolute top-0.5 left-0.5 w-4 h-4 text-[#1a1a1a] pointer-events-none"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            )}
-                        </div>
-                        <span className={`flex-1 ${todo.completed ? 'line-through text-gray-500' : ''}`}>
-                            {todo.title}
-                        </span>
-                        {todo.dueDate && (
-                            <div className="text-right">
-                                <div className="font-bold text-sm text-gray-300">
-                                    {formatDate(todo.dueDate)}
-                                </div>
-                                {todo.reminderTime && (
-                                    <div className="text-xs text-gray-400">
-                                        {formatTime(todo.reminderTime)}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                    <TodoListItem todo={todo} />
                 ))}
             </div>
         </div>
     );
 }
 
-export default App;
+export default ToDoList;
