@@ -80,3 +80,11 @@ ProjectCollaborator {
     userId,
     projectId
 }
+
+User {
+    name,
+    username,
+    password,
+    image,
+    email
+}
