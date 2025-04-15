@@ -1,16 +1,11 @@
-import React, { useState } from "react";
 import {
   LayoutList,
   CalendarDays,
-  User,
-  Heart,
-  GraduationCap,
   CalendarClock,
   CheckSquare,
   Trash2,
   HelpCircle,
   Bell,
-  Plus,
 } from "lucide-react";
 
 const NavItem = ({ icon, label, count, color = "text-white" }) => (
