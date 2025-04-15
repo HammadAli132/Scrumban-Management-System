@@ -46,3 +46,18 @@ Project {
     endDate,
     userId
 }
+
+Sprint {
+    title,
+    startDate,
+    endDate,
+    retrospective,
+    projectId
+}
+
+MeetingNote {
+    title,
+    date,
+    content,
+    projectId
+}
