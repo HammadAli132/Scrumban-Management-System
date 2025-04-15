@@ -1,0 +1,90 @@
+ToDoList {
+    userId
+}
+
+ToDoListTask {
+    toDoListId,
+    status,
+    reminder,
+    notes,
+    title,
+    description,
+    priorityLevel,
+    dueDate
+}
+
+KanbanBoard {
+    projectId
+}
+
+SwimLane {
+    kanbanBoardId
+}
+
+KanbanBoardTask {
+    title,
+    description,
+    priorityLevel,
+    dueDate,
+    swimLaneId,
+    sprintId,
+    userId,
+    kanbanBoardId
+}
+
+Comment {
+    text,
+    date,
+    userId,
+    kanbanBoardTaskId
+}
+
+Project {
+    title,
+    description,
+    startDate,
+    endDate,
+    userId
+}
+
+Sprint {
+    title,
+    startDate,
+    endDate,
+    retrospective,
+    projectId
+}
+
+MeetingNote {
+    title,
+    date,
+    content,
+    projectId
+}
+
+CodeRepository {
+    name,
+    projectId
+}
+
+Commit {
+    hash,
+    file,
+    timestamp,
+    status,
+    userId,
+    repositoryId
+}
+
+ProjectCollaborator {
+    userId,
+    projectId
+}
+
+User {
+    name,
+    username,
+    password,
+    image,
+    email
+}
