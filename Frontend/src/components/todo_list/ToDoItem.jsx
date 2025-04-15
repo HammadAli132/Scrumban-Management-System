@@ -1,4 +1,16 @@
-const ToDoItem = ({ todo, onSelect }) => {
+const ToDoItem = ({ todo, onSelect, setSelectedTodo }) => {
+
+    const handleSelect = () => {
+        setSelectedTodo({
+            id: todo.id,
+            title: todo.title,
+            description: todo.description,
+            dueDate: todo.dueDate,
+            time: todo.reminderTime,
+            priority: todo.priority,
+            tags: todo.tags
+        });
+    }
 
     const getPriorityColor = (priority) => {
         switch (priority) {
@@ -34,7 +46,8 @@ const ToDoItem = ({ todo, onSelect }) => {
     return (
         <div
             key={todo.id}
-            className="flex items-center gap-4 p-4 border-b border-[#2e2d2d] hover:bg-[#2e2d2d] group transition-colors"
+            className="flex items-center gap-4 p-4 border-b border-[#2e2d2d] hover:bg-[#2e2d2d] group transition-colors cursor-pointer"
+            onClick={() => handleSelect()}
         >
             <div className="relative">
                 <input

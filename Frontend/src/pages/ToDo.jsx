@@ -5,7 +5,7 @@ import ToDoList from "../components/todo_list/ToDoList";
 import ToDoSidebar from "../components/todo_list/ToDoSidebar";
 
 export default function ToDo() {
-    const [selectedTodo] = useState({
+    const [selectedTodo, setSelectedTodo] = useState({
         id: 1,
         title: "SE Meeting",
         description: "Software Engineering team meeting to discuss project progress and upcoming milestones.",
@@ -17,7 +17,7 @@ export default function ToDo() {
     return (
         <div className="flex flex-row w-full h-full">
             <ToDoSidebar />
-            <ToDoList />
+            <ToDoList setSelectedTodo={setSelectedTodo} />
             <ToDoDetail todo={selectedTodo}  />
         </div>
     )

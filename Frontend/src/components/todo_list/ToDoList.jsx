@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import ToDoItem from './ToDoItem';
 
-function ToDoList() {
+function ToDoList({setSelectedTodo}) {
     const [todos, setTodos] = useState([
         {
             id: 1,
@@ -81,19 +81,19 @@ function ToDoList() {
                     <div className="flex gap-2">
                         <button
                             onClick={() => setSelectedPriority('high')}
-                            className={`p-2 rounded-lg ${selectedPriority === 'high' ? 'bg-red-500/20' : 'hover:bg-[#2e2d2d]'}`}
+                            className={`p-2 rounded-lg ${selectedPriority === 'high' ? 'bg-red-500/20' : 'hover:bg-[#2e2d2d]'} cursor-pointer`}
                         >
                             <Flag size={20} className="text-red-500" />
                         </button>
                         <button
                             onClick={() => setSelectedPriority('medium')}
-                            className={`p-2 rounded-lg ${selectedPriority === 'medium' ? 'bg-yellow-500/20' : 'hover:bg-[#2e2d2d]'}`}
+                            className={`p-2 rounded-lg ${selectedPriority === 'medium' ? 'bg-yellow-500/20' : 'hover:bg-[#2e2d2d]'} cursor-pointer`}
                         >
                             <Flag size={20} className="text-yellow-500" />
                         </button>
                         <button
                             onClick={() => setSelectedPriority('low')}
-                            className={`p-2 rounded-lg ${selectedPriority === 'low' ? 'bg-blue-500/20' : 'hover:bg-[#2e2d2d]'}`}
+                            className={`p-2 rounded-lg ${selectedPriority === 'low' ? 'bg-blue-500/20' : 'hover:bg-[#2e2d2d]'} cursor-pointer`}
                         >
                             <Flag size={20} className="text-blue-500" />
                         </button>
@@ -105,7 +105,7 @@ function ToDoList() {
                             <Calendar size={20} className="text-gray-400" />
                             <input
                                 type="date"
-                                className="bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark]"
+                                className="bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark] cursor-pointer"
                                 value={selectedDate}
                                 onChange={(e) => setSelectedDate(e.target.value)}
                             />
@@ -116,7 +116,7 @@ function ToDoList() {
                             <Clock size={20} className="text-gray-400" />
                             <input
                                 type="time"
-                                className="bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark]"
+                                className="bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark] cursor-pointer"
                                 value={selectedTime}
                                 onChange={(e) => setSelectedTime(e.target.value)}
                             />
@@ -124,7 +124,7 @@ function ToDoList() {
 
                         <button
                             onClick={handleAddTodo}
-                            className=" bg-blue-500 hover:bg-blue-600 rounded-lg p-2 transition-colors"
+                            className=" bg-blue-500 hover:bg-blue-600 rounded-lg p-2 transition-colors cursor-pointer"
                         >
                             <Plus size={20} />
                         </button>
@@ -137,7 +137,7 @@ function ToDoList() {
             {/* Todo List */}
             <div className="flex-1 overflow-y-auto">
                 {todos.map(todo => (
-                    <ToDoItem todo={todo} onSelect={handleSelectTodoCheckbox}/>
+                    <ToDoItem todo={todo} setSelectedTodo={setSelectedTodo} onSelect={handleSelectTodoCheckbox}/>
                 ))}
             </div>
         </div>
