@@ -38,3 +38,9 @@ Comment {
     userId,
     kanbanBoardTaskId
 }
+
+Project {
+    title,
+    description,
+    
+}
