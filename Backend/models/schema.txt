@@ -61,3 +61,8 @@ MeetingNote {
     content,
     projectId
 }
+
+CodeRepository {
+    name,
+    projectId
+}
