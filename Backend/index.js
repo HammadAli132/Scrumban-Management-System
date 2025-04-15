@@ -3,10 +3,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const {logger} = require('./middleware/logger');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv').config();
+const dotenv = require('dotenv');
 const router = require('./routes');
 
-
+dotenv.config();
 const app = express();
 
 app.use(logger);
