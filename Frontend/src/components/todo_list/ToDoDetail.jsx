@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Clock, Flag as Flag2 } from 'lucide-react';
+import { Flag as Flag2 } from 'lucide-react';
 import { useToDoContext } from '../../contexts/todoContext';
 
 export default function ToDoDetail() {
-    const { selectedTodo } = useToDoContext();
+    const { selectedTodo, setSelectedTodo } = useToDoContext();
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -35,6 +35,8 @@ export default function ToDoDetail() {
         selectedTodo.dueDate = dueDate;
         selectedTodo.reminderTime = time;
         selectedTodo.priority = priority;
+
+        setSelectedTodo({ ...selectedTodo });
     };
 
     const handleDelete = () => {
@@ -43,12 +45,25 @@ export default function ToDoDetail() {
 
     const inputClass = "bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark] cursor-pointer";
 
+    const flagColor = (priority) => {
+        switch (priority) {
+            case 'high':
+                return 'text-red-500';
+            case 'medium':
+                return 'text-yellow-500';
+            case 'low':
+                return 'text-blue-500';
+            default:
+                return 'text-gray-400';
+        }
+    }
+
     return (
         <div className="flex flex-col w-1/3 border-l border-[#2e2d2d] bg-[#1c1c1c] text-gray-200">
             {/* Top Meta Info (Editable) */}
             <div className="p-6 border-b border-[#2e2d2d] space-y-4">
                 <div className="flex items-center justify-between gap-4">
-                    <div className="flex gap-2 items-center">
+                    <div className="flex items-center space-x-2 w-1/3">
                         <input
                             type="date"
                             value={dueDate}
@@ -66,9 +81,9 @@ export default function ToDoDetail() {
                             placeholder="Reminder"
                         />
                     </div>
-                    <div className="flex items-center space-x-2 w-1/3">
-                        <Flag2 className="w-4 h-4 text-red-500" />
-                        <span className="text-sm">{priority}</span>
+                    <div className="flex items-center space-x-2 w-1/3 justify-end">
+                        <Flag2 className={`w-4 h-4 ${flagColor(priority)}`} />
+                        <span className="text-sm">{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
                     </div>
                 </div>
             </div>
