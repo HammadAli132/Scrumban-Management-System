@@ -6,4 +6,7 @@ const toDoListSchema = new mongoose.Schema({
         ref: 'user',
         required: true
     }  
-}, {timestamps: true})
+}, {timestamps: true});
+
+const ToDoList = mongoose.model('todolist', toDoListSchema);
+module.exports = ToDoList;
