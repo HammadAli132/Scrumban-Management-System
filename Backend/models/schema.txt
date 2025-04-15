@@ -66,3 +66,12 @@ CodeRepository {
     name,
     projectId
 }
+
+Commit {
+    hash,
+    file,
+    timestamp,
+    status,
+    userId,
+    repositoryId
+}
