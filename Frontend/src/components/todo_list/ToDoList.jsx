@@ -7,26 +7,10 @@ import {
     Plus
 } from 'lucide-react';
 import ToDoItem from './ToDoItem';
+import { useToDoContext } from '../../contexts/todoContext';
 
-function ToDoList({setSelectedTodo}) {
-    const [todos, setTodos] = useState([
-        {
-            id: 1,
-            title: "Complete project documentation",
-            completed: false,
-            priority: "high",
-            dueDate: "2024-03-15",
-            reminderTime: "14:00"
-        },
-        {
-            id: 2,
-            title: "Review pull requests",
-            completed: false,
-            priority: "medium",
-            dueDate: "2024-03-14",
-            reminderTime: null
-        }
-    ]);
+function ToDoList() {
+    const { todos, setTodos } = useToDoContext();
     const [newTodo, setNewTodo] = useState("");
     const [selectedPriority, setSelectedPriority] = useState(null);
     const [selectedDate, setSelectedDate] = useState("");
@@ -137,7 +121,7 @@ function ToDoList({setSelectedTodo}) {
             {/* Todo List */}
             <div className="flex-1 overflow-y-auto">
                 {todos.map(todo => (
-                    <ToDoItem todo={todo} setSelectedTodo={setSelectedTodo} onSelect={handleSelectTodoCheckbox}/>
+                    <ToDoItem todo={todo} onSelect={handleSelectTodoCheckbox}/>
                 ))}
             </div>
         </div>

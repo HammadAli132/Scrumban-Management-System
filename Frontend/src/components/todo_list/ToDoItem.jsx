@@ -1,4 +1,7 @@
-const ToDoItem = ({ todo, onSelect, setSelectedTodo }) => {
+import { useToDoContext } from "../../contexts/todoContext";
+
+const ToDoItem = ( { todo, onSelect } ) => {
+    const { setSelectedTodo } = useToDoContext();
 
     const handleSelect = () => {
         setSelectedTodo({
