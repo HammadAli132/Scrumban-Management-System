@@ -76,7 +76,7 @@ Commit {
     repositoryId
 }
 
-ProjectCollaborators {
+ProjectCollaborator {
     userId,
     projectId
 }
