@@ -42,5 +42,7 @@ Comment {
 Project {
     title,
     description,
-    
+    startDate,
+    endDate,
+    userId
 }
