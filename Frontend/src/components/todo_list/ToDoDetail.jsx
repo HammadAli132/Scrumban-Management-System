@@ -35,37 +35,45 @@ export default function ToDoDetail() {
         selectedTodo.dueDate = dueDate;
         selectedTodo.reminderTime = time;
         selectedTodo.priority = priority;
-
-        // You might want to call a context method here to trigger a refresh/re-render
-        console.log('Todo saved:', selectedTodo);
     };
 
     const handleDelete = () => {
-        // Handle delete logic here
         console.log('Deleting selectedTodo:', selectedTodo.id);
     };
 
+    const inputClass = "bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark] cursor-pointer";
+
     return (
         <div className="flex flex-col w-1/3 border-l border-[#2e2d2d] bg-[#1c1c1c] text-gray-200">
-            {/* Top Meta Info */}
+            {/* Top Meta Info (Editable) */}
             <div className="p-6 border-b border-[#2e2d2d] space-y-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm">{dueDate}</span>
+                <div className="flex items-center justify-between gap-4">
+                    <div className="flex gap-2 items-center">
+                        <input
+                            type="date"
+                            value={dueDate}
+                            onChange={(e) => setDueDate(e.target.value)}
+                            className={`${inputClass} w-full`}
+                            placeholder="Due Date"
+                        />
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm">{time}</span>
+                    <div className="flex items-center space-x-2 w-1/3">
+                        <input
+                            type="time"
+                            value={time}
+                            onChange={(e) => setTime(e.target.value)}
+                            className={`${inputClass} w-full`}
+                            placeholder="Reminder"
+                        />
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 w-1/3">
                         <Flag2 className="w-4 h-4 text-red-500" />
                         <span className="text-sm">{priority}</span>
                     </div>
                 </div>
             </div>
 
-            {/* Description */}
+            {/* Content */}
             <div className="flex-1 p-6 space-y-6">
                 <input
                     type="text"
