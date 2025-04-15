@@ -1,0 +1,37 @@
+ToDoList {
+    userId
+}
+
+ToDoListTask {
+    toDoListId,
+    status,
+    reminder,
+    notes,
+    title,
+    description,
+    priorityLevel,
+    dueDate
+}
+
+KanbanBoard {
+    projectId
+}
+
+SwimLane {
+    kanbanBoardId
+}
+
+KanbanBoardTask {
+    title,
+    description,
+    priorityLevel,
+    dueDate,
+    swimLaneId,
+    sprintId,
+    userId,
+    kanbanBoardId
+}
+
+Comment {
+    
+}
