@@ -1,7 +1,18 @@
 const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const {logger} = require('./middleware/logger');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv').config();
+const router = require('./routes');
+
+
 const app = express();
 
-const router = require('./routes');
+app.use(logger);
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
