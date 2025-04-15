@@ -1,10 +1,25 @@
-import React, { useState } from 'react';
-import { Calendar, Clock, Flag as Flag2, Tags } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Calendar, Clock, Flag as Flag2 } from 'lucide-react';
 import { useToDoContext } from '../../contexts/todoContext';
-
 
 export default function ToDoDetail() {
     const { selectedTodo } = useToDoContext();
+
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [dueDate, setDueDate] = useState('');
+    const [time, setTime] = useState('');
+    const [priority, setPriority] = useState('');
+
+    useEffect(() => {
+        if (selectedTodo) {
+            setTitle(selectedTodo.title || '');
+            setDescription(selectedTodo.description || '');
+            setDueDate(selectedTodo.dueDate || 'No Due Date');
+            setTime(selectedTodo.reminderTime || 'No Reminder');
+            setPriority(selectedTodo.priority || '');
+        }
+    }, [selectedTodo]);
 
     if (!selectedTodo) {
         return (
@@ -14,18 +29,15 @@ export default function ToDoDetail() {
         );
     }
 
-    const [title, setTitle] = useState(selectedTodo.title || '');
-    const [description, setDescription] = useState(selectedTodo.description || '');
-    const [dueDate, setDueDate] = useState(selectedTodo.dueDate || '');
-    const [time, setTime] = useState(selectedTodo.time || '');
-    const [priority, setPriority] = useState(selectedTodo.priority || '');
-
     const handleSave = () => {
         selectedTodo.title = title;
         selectedTodo.description = description;
         selectedTodo.dueDate = dueDate;
-        selectedTodo.time = time;
+        selectedTodo.reminderTime = time;
         selectedTodo.priority = priority;
+
+        // You might want to call a context method here to trigger a refresh/re-render
+        console.log('Todo saved:', selectedTodo);
     };
 
     const handleDelete = () => {
@@ -40,34 +52,34 @@ export default function ToDoDetail() {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm">{selectedTodo.dueDate}</span>
+                        <span className="text-sm">{dueDate}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <Clock className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm">{selectedTodo.time}</span>
+                        <span className="text-sm">{time}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <Flag2 className="w-4 h-4 text-red-500" />
-                        <span className="text-sm">{selectedTodo.priority}</span>
+                        <span className="text-sm">{priority}</span>
                     </div>
                 </div>
-
             </div>
+
+            {/* Description */}
             <div className="flex-1 p-6 space-y-6">
-                <h2 className="text-xl ml-[10px] font-semibold">{selectedTodo.title}</h2>
-
-                {/* Content */}
-
-                {/* Description */}
-                <div>
-                    <textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        className="w-full h-96 bg-transparent rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-gray-500 resize-none"
-                        placeholder="Notes..."
-                    />
-                </div>
-
+                <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full bg-transparent border-none text-xl font-semibold mb-4 focus:outline-none focus:border-gray-300"
+                    placeholder="Title"
+                />
+                <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full h-96 bg-transparent rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-gray-500 resize-none"
+                    placeholder="Notes..."
+                />
             </div>
 
             {/* Action Buttons */}

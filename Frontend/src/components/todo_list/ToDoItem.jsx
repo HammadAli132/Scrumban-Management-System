@@ -3,18 +3,6 @@ import { useToDoContext } from "../../contexts/todoContext";
 const ToDoItem = ( { todo, onSelect } ) => {
     const { setSelectedTodo } = useToDoContext();
 
-    const handleSelect = () => {
-        setSelectedTodo({
-            id: todo.id,
-            title: todo.title,
-            description: todo.description,
-            dueDate: todo.dueDate,
-            time: todo.reminderTime,
-            priority: todo.priority,
-            tags: todo.tags
-        });
-    }
-
     const getPriorityColor = (priority) => {
         switch (priority) {
             case 'high': return 'text-red-500 border-red-500';
@@ -50,7 +38,7 @@ const ToDoItem = ( { todo, onSelect } ) => {
         <div
             key={todo.id}
             className="flex items-center gap-4 p-4 border-b border-[#2e2d2d] hover:bg-[#2e2d2d] group transition-colors cursor-pointer"
-            onClick={() => handleSelect()}
+            onClick={() => setSelectedTodo(todo)}
         >
             <div className="relative">
                 <input
