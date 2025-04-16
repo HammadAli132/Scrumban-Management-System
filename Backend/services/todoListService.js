@@ -44,9 +44,24 @@ const getCompletedTodosByUserId = async (userId) => {
   }
 }
 
+const getTrashedTodosByUserId = async (userId) => {
+    try {
+        const todoList = await ToDoList.findOne({ userId });
+        const toDoListId = todoList._id;
+    
+        const todos = await ToDoListTask.find({ toDoListId, inTrash: true }).populate("toDoListId", "userId");
+        if (!todos) {
+        throw new Error("No trashed todos found for this user");
+        }
+        return todos;
+    } catch (error) {
+        throw new Error("Error getting trashed todos: " + error.message);
+    }
+}
+
 const test = async () => {
     try {
-        const todos = await getCompletedTodosByUserId("67ff6def424226671a0d62d7");
+        const todos = await getTrashedTodosByUserId("67ff6def424226671a0d62d7");
         console.log(todos);
     } catch (error) {
         console.error(error.message);
