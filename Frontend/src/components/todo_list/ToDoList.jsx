@@ -121,7 +121,7 @@ function ToDoList() {
             {/* Todo List */}
             <div className="flex-1 overflow-y-auto">
                 {todos.map(todo => (
-                    <ToDoItem todo={todo} onSelect={handleSelectTodoCheckbox}/>
+                    <ToDoItem key={todo.id} todo={todo} onSelect={handleSelectTodoCheckbox}/>
                 ))}
             </div>
         </div>
