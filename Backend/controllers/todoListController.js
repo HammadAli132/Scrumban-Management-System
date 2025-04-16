@@ -95,3 +95,13 @@ const markToDoListTaskAsCompleted = async (req, res) => {
         res.status(500).json({success: false, error: error.message});
     }
 };
+
+module.exports = {
+    getAllToDoListTasks,
+    getCompletedToDoListTasks,
+    getTrashedToDoListTasks,
+    updateToDoListTask,
+    deleteToDoListTask,
+    markToDoListTaskAsCompleted
+};
+
