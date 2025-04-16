@@ -10,7 +10,8 @@ ToDoListTask {
     title,
     description,
     priorityLevel,
-    dueDate
+    dueDate,
+    inTrash
 }
 
 KanbanBoard {
