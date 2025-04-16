@@ -1,7 +1,5 @@
 const ToDoList = require("../models/toDoList");
 const ToDoListTask = require("../models/toDoListTask");
-const mongoose = require("mongoose");
-
 
 // uncomment this line to create connection to the database while testing
 
