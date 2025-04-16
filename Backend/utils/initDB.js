@@ -97,7 +97,23 @@ async function initDB() {
             const todoList = await ToDoList.create({ userId: user._id });
             todoLists.push(todoList);
         }
-        console.log('Todo lists created successfully');
+        console.log('Todo lists created successfully', todoLists);
+
+        // creating tasks for each todo list
+        const tasks = [];
+        for (let i = 0; i < todoLists.length; i++) {
+            const todoList = todoLists[i];
+            
+            // Create a task for each todo list
+            const taskData = {
+                ...dummyTasks[i],
+                toDoListId: todoList._id
+            };
+            
+            const task = await ToDoListTask.create(taskData);
+            tasks.push(task);
+        }
+        console.log('Tasks created successfully', tasks);
     } catch (error) {
         console.error('Error during database initialization:', error);
         throw error;
