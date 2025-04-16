@@ -87,9 +87,25 @@ const deleteTodoById = async (todoId) => {
     }
 }   
 
+const completeTodoById = async (todoId) => {
+    try {
+        const updatedTodo = await ToDoListTask.findOneAndUpdate(
+            { _id: todoId },
+            { status: "completed" },
+            { new: true }
+        );
+        if (!updatedTodo) {
+            throw new Error("Todo not found");
+        }
+        return updatedTodo;
+    } catch (error) {
+        throw new Error("Error completing todo: " + error.message);
+    }
+}
+
 const test = async () => {
     try {
-        const todos = await deleteTodoById("67ff6df0424226671a0d62ea");
+        const todos = await completeTodoById("67ff6df0424226671a0d62ee");
         console.log(todos);
     } catch (error) {
         console.error(error.message);
