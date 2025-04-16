@@ -36,5 +36,5 @@ const toDoListTaskSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-const toDoListTask = mongoose.model("todolisttask", toDoListTaskSchema);
-module.exports = toDoListTask;
+const ToDoListTask = mongoose.model("todolisttask", toDoListTaskSchema);
+module.exports = ToDoListTask;
