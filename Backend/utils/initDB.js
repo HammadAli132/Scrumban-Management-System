@@ -118,4 +118,6 @@ async function initDB() {
         console.error('Error during database initialization:', error);
         throw error;
     }
-}
+};
+
+module.exports = { initDB };
