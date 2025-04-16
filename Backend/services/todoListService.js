@@ -59,9 +59,25 @@ const getTrashedTodosByUserId = async (userId) => {
     }
 }
 
+const updateTodoById = async (todoId, updateData) => {
+    try {
+        const updatedTodo = await ToDoListTask.findOneAndUpdate(
+            { _id: todoId },
+            updateData,
+            { new: true }
+        );
+        if (!updatedTodo) {
+            throw new Error("Todo not found");
+        }
+        return updatedTodo;
+    } catch (error) {
+        throw new Error("Error updating todo: " + error.message);
+    }
+}
+
 const test = async () => {
     try {
-        const todos = await getTrashedTodosByUserId("67ff6def424226671a0d62d7");
+        const todos = await updateTodoById("67ff6df0424226671a0d62ea", {title: "Updated Title"});
         console.log(todos);
     } catch (error) {
         console.error(error.message);
