@@ -1,5 +1,5 @@
 const express = require("express");
-const { getAllToDoListTasks, getCompletedToDoListTasks, getTrashedToDoListTasks, updateToDoListTask, deleteToDoListTask } = require("../controllers/todoListController");
+const { getAllToDoListTasks, getCompletedToDoListTasks, getTrashedToDoListTasks, updateToDoListTask, deleteToDoListTask, markToDoListTaskAsCompleted } = require("../controllers/todoListController");
 
 const router = express.Router();
 
@@ -8,7 +8,8 @@ const router = express.Router();
 router.get("/:userId", getAllToDoListTasks);
 router.get("/completed/:userId", getCompletedToDoListTasks);
 router.get("/trashed/:userId", getTrashedToDoListTasks);
-router.put("/update/:id", updateToDoListTask);
-router.delete("delete/:id", deleteToDoListTask);
+router.put("/:id", updateToDoListTask);
+router.delete("/:id", deleteToDoListTask);
+router.get("/markdone/:id", markToDoListTaskAsCompleted);
 
 module.exports = router;
