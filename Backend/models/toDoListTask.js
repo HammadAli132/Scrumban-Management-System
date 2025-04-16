@@ -28,7 +28,7 @@ const toDoListTaskSchema = new mongoose.Schema({
     priorityLevel: {
         type: String,
         enum: ['low', 'medium', 'high'],
-        default: 'low'
+        default: 'medium'
     },
     dueDate: {
         type: Date,
