@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 const todoRouter = require('./routes/todoListRoutes');
+const { initDB } = require('./utils/initDB.js');
 
 dotenv.config();
 const app = express();
@@ -28,6 +29,8 @@ app.listen(PORT, () => {
 		mongoose.connect("mongodb://localhost:27017/scrumbandb");
 		console.log(`Connected to MongoDB`);
 		console.log(`Server is running at http://localhost:${PORT}`);
+
+		initDB();
 	} catch (error) {
 		console.log(`Error connecting to MongoDB: ${error.message}`);
 	}

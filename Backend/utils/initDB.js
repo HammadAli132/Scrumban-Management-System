@@ -89,7 +89,7 @@ async function initDB() {
 
         // creating dummy users
         const users = await User.insertMany(dummyUsers);
-        console.log('Users created successfully:', users);
+        // console.log('Users created successfully:', users);
 
         // creating todo list for each user
         const todoLists = [];
@@ -97,7 +97,7 @@ async function initDB() {
             const todoList = await ToDoList.create({ userId: user._id });
             todoLists.push(todoList);
         }
-        console.log('Todo lists created successfully', todoLists);
+        // console.log('Todo lists created successfully', todoLists);
 
         // creating tasks for each todo list
         const tasks = [];
@@ -113,7 +113,7 @@ async function initDB() {
             const task = await ToDoListTask.create(taskData);
             tasks.push(task);
         }
-        console.log('Tasks created successfully', tasks);
+        // console.log('Tasks created successfully', tasks);
     } catch (error) {
         console.error('Error during database initialization:', error);
         throw error;
