@@ -1,23 +1,13 @@
 const express = require("express");
+const { getAllToDoListTasks, getCompletedToDoListTasks, getTrashedToDoListTasks, updateToDoListTask } = require("../controllers/todoListController");
 
 const router = express.Router();
 
 // I have written the function names in the dummy controllers
 
-router.get("/", (req, res) => {
-  res.send("getAllTodos");
-});
-
-router.post("/", (req, res) => {
-    res.send("createTodo");
-})
-
-router.get("/:id", (req, res) => {
-    res.send("getTodoById");
-});
-
-router.get("/user/:userid", (req, res) => {
-    res.send("getTodosByUserId");
-});
+router.get("/:userId", getAllToDoListTasks);
+router.get("/completed/:userId", getCompletedToDoListTasks);
+router.get("/trashed/:userId", getTrashedToDoListTasks);
+router.put("/update/:id", updateToDoListTask);
 
 module.exports = router;
