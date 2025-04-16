@@ -75,9 +75,21 @@ const updateTodoById = async (todoId, updateData) => {
     }
 }
 
+const deleteTodoById = async (todoId) => {
+    try {
+        const deletedTodo = await ToDoListTask.findOneAndDelete({ _id: todoId });
+        if (!deletedTodo) {
+            throw new Error("Todo not found");
+        }
+        return deletedTodo;
+    } catch (error) {
+        throw new Error("Error deleting todo: " + error.message);
+    }
+}   
+
 const test = async () => {
     try {
-        const todos = await updateTodoById("67ff6df0424226671a0d62ea", {title: "Updated Title"});
+        const todos = await deleteTodoById("67ff6df0424226671a0d62ea");
         console.log(todos);
     } catch (error) {
         console.error(error.message);
