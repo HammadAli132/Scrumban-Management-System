@@ -3,10 +3,12 @@ const ToDoListTask = require("../models/toDoListTask");
 const mongoose = require("mongoose");
 
 
-mongoose.connect("mongodb://localhost:27017/scrumbandb"); // remove this file after testing
-mongoose.connection.on("connected", () => {
-  console.log("Connected to MongoDB");
-});
+// uncomment this line to create connection to the database while testing
+
+// mongoose.connect("mongodb://localhost:27017/scrumbandb"); // remove this file after testing
+// mongoose.connection.on("connected", () => {
+//   console.log("Connected to MongoDB");
+// });
 
 /**
  * Get all todos given a user id
@@ -103,12 +105,24 @@ const completeTodoById = async (todoId) => {
     }
 }
 
-const test = async () => {
-    try {
-        const todos = await completeTodoById("67ff6df0424226671a0d62ee");
-        console.log(todos);
-    } catch (error) {
-        console.error(error.message);
-    }
+// test using this function if added any new service
+
+// const test = async () => {
+//     try {
+//         const todos = await completeTodoById("67ff6df0424226671a0d62ee");
+//         console.log(todos);
+//     } catch (error) {
+//         console.error(error.message);
+//     }
+// }
+// test();
+
+
+module.exports = {
+    getAllToDosByUserId,
+    getCompletedTodosByUserId,
+    getTrashedTodosByUserId,
+    updateTodoById,
+    deleteTodoById,
+    completeTodoById
 }
-test();
