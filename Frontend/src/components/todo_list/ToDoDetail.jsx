@@ -3,7 +3,7 @@ import { Flag as Flag2 } from 'lucide-react';
 import { useToDoContext } from '../../contexts/todoContext';
 
 export default function ToDoDetail() {
-    const { selectedTodo, setSelectedTodo } = useToDoContext();
+    const { selectedTodo, setSelectedTodo, todos, setTodos } = useToDoContext();
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -40,7 +40,14 @@ export default function ToDoDetail() {
     };
 
     const handleDelete = () => {
-        console.log('Deleting selectedTodo:', selectedTodo.id);
+        // first we filter the selected todo from the todos array
+        const filteredTodos = todos.filter((todo) => todo.id !== selectedTodo.id);
+
+        // then we set the selected todo to undefined
+        setSelectedTodo(undefined);
+
+        // finally we set the todos array to the filtered array
+        setTodos(filteredTodos);
     };
 
     const inputClass = "bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark] cursor-pointer";

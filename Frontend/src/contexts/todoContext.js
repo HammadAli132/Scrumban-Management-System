@@ -8,4 +8,10 @@ export const ToDoListContext = createContext({
   setSelectedTodo: () => {}
 });
 
+export const CompletedToDoListContext = createContext({
+  completedToDos: [],
+  setCompletedToDos: () => {},
+});
+
 export const useToDoContext = () => useContext(ToDoListContext);
+export const useCompToDoContext = () => useContext(CompletedToDoListContext);
