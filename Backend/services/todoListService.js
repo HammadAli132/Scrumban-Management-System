@@ -14,7 +14,7 @@ mongoose.connection.on("connected", () => {
  * @return {Promise<Array>} - A promise that resolves to an array of todos
  */
 
-const getAllToDos = async (userId) => {
+const getAllToDosByUserId = async (userId) => {
   try {
     const todoList = await ToDoList.findOne({ userId });
     const toDoListId = todoList._id;
@@ -29,10 +29,24 @@ const getAllToDos = async (userId) => {
   }
 }
 
+const getCompletedTodosByUserId = async (userId) => {
+  try {
+    const todoList = await ToDoList.findOne({ userId });
+    const toDoListId = todoList._id;
+
+    const todos = await ToDoListTask.find({ toDoListId, status: "completed" }).populate("toDoListId", "userId");
+    if (!todos) {
+      throw new Error("No completed todos found for this user");
+    }
+    return todos;
+  } catch (error) {
+    throw new Error("Error getting completed todos: " + error.message);
+  }
+}
 
 const test = async () => {
     try {
-        const todos = await getAllToDos("67ff6def424226671a0d62d7");
+        const todos = await getCompletedTodosByUserId("67ff6def424226671a0d62d7");
         console.log(todos);
     } catch (error) {
         console.error(error.message);
