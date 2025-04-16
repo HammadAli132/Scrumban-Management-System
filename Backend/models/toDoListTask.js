@@ -33,6 +33,10 @@ const toDoListTaskSchema = new mongoose.Schema({
     dueDate: {
         type: Date,
         required: true
+    },
+    inTrash: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true});
 
