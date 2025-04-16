@@ -6,106 +6,11 @@ import {
     Flag,
     Plus
 } from 'lucide-react';
-
-const TodoListItem = ({ todo, onSelect }) => {
-
-    const getPriorityColor = (priority) => {
-        switch (priority) {
-            case 'high': return 'text-red-500 border-red-500';
-            case 'medium': return 'text-yellow-500 border-yellow-500';
-            case 'low': return 'text-blue-500 border-blue-500';
-            default: return 'text-gray-400 border-gray-400';
-        }
-    };
-
-    const formatDate = (dateStr) => {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('en-US', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
-    };
-
-    const formatTime = (timeStr) => {
-        const [hours, minutes] = timeStr.split(':');
-        const date = new Date();
-        date.setHours(parseInt(hours), parseInt(minutes));
-        return date.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-    };
-
-
-    return (
-        <div
-            key={todo.id}
-            className="flex items-center gap-4 p-4 border-b border-[#2e2d2d] hover:bg-[#2e2d2d] group transition-colors"
-        >
-            <div className="relative">
-                <input
-                    type="checkbox"
-                    checked={todo.completed}
-                    onChange={() => onSelect(todo.id)}
-                    className={`w-5 h-5 rounded-sm appearance-none border-2 ${getPriorityColor(todo.priority)} 
-                  checked:bg-current checked:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-offset-[#1a1a1a] transition-colors cursor-pointer`}
-                />
-                {todo.completed && (
-                    <svg
-                        className="absolute top-0.5 left-0.5 w-4 h-4 text-[#1a1a1a] pointer-events-none"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path d="M5 13l4 4L19 7"></path>
-                    </svg>
-                )}
-            </div>
-            <span className={`flex-1 font-normal text-sm ${todo.completed ? 'line-through text-gray-500' : ''}`}>
-                {todo.title}
-            </span>
-            {todo.dueDate && (
-                <div className="text-right">
-                    <div className="font-bold text-sm text-gray-300">
-                        {formatDate(todo.dueDate)}
-                    </div>
-                    {todo.reminderTime && (
-                        <div className="text-xs text-gray-400">
-                            {formatTime(todo.reminderTime)}
-                        </div>
-                    )}
-                </div>
-            )}
-        </div>
-    )
-}
-
+import ToDoItem from './ToDoItem';
+import { useToDoContext } from '../../contexts/todoContext';
 
 function ToDoList() {
-    const [todos, setTodos] = useState([
-        {
-            id: 1,
-            title: "Complete project documentation",
-            completed: false,
-            priority: "high",
-            dueDate: "2024-03-15",
-            reminderTime: "14:00"
-        },
-        {
-            id: 2,
-            title: "Review pull requests",
-            completed: false,
-            priority: "medium",
-            dueDate: "2024-03-14",
-            reminderTime: null
-        }
-    ]);
+    const { todos, setTodos } = useToDoContext();
     const [newTodo, setNewTodo] = useState("");
     const [selectedPriority, setSelectedPriority] = useState(null);
     const [selectedDate, setSelectedDate] = useState("");
@@ -160,19 +65,19 @@ function ToDoList() {
                     <div className="flex gap-2">
                         <button
                             onClick={() => setSelectedPriority('high')}
-                            className={`p-2 rounded-lg ${selectedPriority === 'high' ? 'bg-red-500/20' : 'hover:bg-[#2e2d2d]'}`}
+                            className={`p-2 rounded-lg ${selectedPriority === 'high' ? 'bg-red-500/20' : 'hover:bg-[#2e2d2d]'} cursor-pointer`}
                         >
                             <Flag size={20} className="text-red-500" />
                         </button>
                         <button
                             onClick={() => setSelectedPriority('medium')}
-                            className={`p-2 rounded-lg ${selectedPriority === 'medium' ? 'bg-yellow-500/20' : 'hover:bg-[#2e2d2d]'}`}
+                            className={`p-2 rounded-lg ${selectedPriority === 'medium' ? 'bg-yellow-500/20' : 'hover:bg-[#2e2d2d]'} cursor-pointer`}
                         >
                             <Flag size={20} className="text-yellow-500" />
                         </button>
                         <button
                             onClick={() => setSelectedPriority('low')}
-                            className={`p-2 rounded-lg ${selectedPriority === 'low' ? 'bg-blue-500/20' : 'hover:bg-[#2e2d2d]'}`}
+                            className={`p-2 rounded-lg ${selectedPriority === 'low' ? 'bg-blue-500/20' : 'hover:bg-[#2e2d2d]'} cursor-pointer`}
                         >
                             <Flag size={20} className="text-blue-500" />
                         </button>
@@ -184,7 +89,7 @@ function ToDoList() {
                             <Calendar size={20} className="text-gray-400" />
                             <input
                                 type="date"
-                                className="bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark]"
+                                className="bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark] cursor-pointer"
                                 value={selectedDate}
                                 onChange={(e) => setSelectedDate(e.target.value)}
                             />
@@ -195,7 +100,7 @@ function ToDoList() {
                             <Clock size={20} className="text-gray-400" />
                             <input
                                 type="time"
-                                className="bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark]"
+                                className="bg-[#2e2d2d] rounded-lg p-2 text-sm text-white border border-[#3e3e3e] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [color-scheme:dark] cursor-pointer"
                                 value={selectedTime}
                                 onChange={(e) => setSelectedTime(e.target.value)}
                             />
@@ -203,7 +108,7 @@ function ToDoList() {
 
                         <button
                             onClick={handleAddTodo}
-                            className=" bg-blue-500 hover:bg-blue-600 rounded-lg p-2 transition-colors"
+                            className=" bg-blue-500 hover:bg-blue-600 rounded-lg p-2 transition-colors cursor-pointer"
                         >
                             <Plus size={20} />
                         </button>
@@ -216,7 +121,7 @@ function ToDoList() {
             {/* Todo List */}
             <div className="flex-1 overflow-y-auto">
                 {todos.map(todo => (
-                    <TodoListItem todo={todo} onSelect={handleSelectTodoCheckbox}/>
+                    <ToDoItem key={todo.id} todo={todo} onSelect={handleSelectTodoCheckbox}/>
                 ))}
             </div>
         </div>
