@@ -35,3 +35,42 @@ const updateKanbanBoardTitleById = async (kanbanBoardId, updatedTitle) => {
         throw new Error("Error updating kanban board title: " + error.message);
     }
 };
+
+const updateKanbanBoardTaskTitleById = async (taskId, updatedTitle) => {
+    try {
+        const updatedTask = await KanbanBoardTask.findOneAndUpdate(
+            {_id: taskId},
+            {title: updatedTitle},
+            {new: true}
+        );
+
+        if (!updatedTask) {
+            throw new Error("Kanban Board Task not found");
+        }
+
+        return updatedTask;
+    } catch (error) {
+        throw new Error("Error updating kanban board task title: " + error.message);
+    }
+};
+
+const createKanbanBoardTaskByProjectId = async (projectId, taskData) => {
+    try {
+        const kanbanBoard = await KanbanBoard.findOne({projectId: projectId});
+
+        if (!kanbanBoard) {
+            throw new Error("Kanban Board not found for this Project.");
+        }
+
+        const kanbanBoardId = kanbanBoard._id;
+
+        const newTask = await KanbanBoardTask.create(
+            ...taskData,
+            kanbanBoardId
+        );
+
+        return newTask;
+    } catch (error) {
+        throw new Error("Error creating kanban board task: " + error.message);
+    }
+};
