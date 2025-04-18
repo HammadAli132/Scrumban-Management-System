@@ -19,7 +19,19 @@ function ToDoList() {
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedTime, setSelectedTime] = useState("");
 
-    const handleSelectTodoCheckbox = (id) => {
+    const handleSelectTodoCheckbox = async (id) => {
+        const todo = todos.find(t => t.id === id);
+        const response = await axios.put(`${apiUrl}/todos/${id}`, {
+            ...todo,
+            status: todo.completed === "completed" ? "pending" : "completed",
+            priorityLevel: todo.priority,
+            reminder: todo.reminderTime,
+        });
+
+        if (response.status !== 200) {
+            throw new Error("Failed to update todo status");
+        }
+
         setTodos(todos.map(t =>
             t.id === id ? { ...t, completed: t.completed === "completed" ? "pending" : "completed" } : t
         ))

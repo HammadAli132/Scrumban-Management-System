@@ -32,7 +32,7 @@ const ToDoSidebar = () => {
       <div className="h-full p-3 flex lg:flex-col flex-row lg:gap-6 gap-4 overflow-x-auto lg:overflow-y-auto border-r border-[#282828]">
         {/* Main Navigation */}
         <ul className="space-y-1 lg:w-full flex lg:flex-col flex-row lg:gap-0 gap-4">
-          <NavItem icon={<LayoutList size={20} color="#a7a7a7" />} label="All" count={todos.length} />
+          <NavItem icon={<LayoutList size={20} color="#a7a7a7" />} label="All" count={todos.length} link={"/to-do-list"} />
           <NavItem icon={<CalendarDays size={20} color="#a7a7a7" />} label="Today" count={0} />
           <NavItem icon={<CalendarClock size={20} color="#a7a7a7" />} label="Next 7 Days" count={0} />
         </ul>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Flag as Flag2 } from 'lucide-react';
 import { useToDoContext } from '../../contexts/todoContext';
 const apiUrl = import.meta.env.VITE_API_URL;
-const userId = import.meta.env.VITE_USER_ID;
 import axios from 'axios';
 
 export default function ToDoDetail() {
