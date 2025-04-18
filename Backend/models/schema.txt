@@ -18,16 +18,12 @@ KanbanBoard {
     projectId
 }
 
-SwimLane {
-    kanbanBoardId
-}
-
 KanbanBoardTask {
     title,
     description,
     priorityLevel,
     dueDate,
-    swimLaneId,
+    swimLane,
     sprintId,
     userId,
     kanbanBoardId

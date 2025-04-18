@@ -20,9 +20,8 @@ const kanbanBoardTaskSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    swimLaneId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'swimlane', 
+    swimLane: {
+        type: String,
         required: true
     },
     sprintId: {
