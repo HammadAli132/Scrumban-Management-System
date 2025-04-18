@@ -72,7 +72,7 @@ const getTrashedToDoListTasks = async (req, res) => {
 const updateToDoListTask = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status, reminder, notes, title, description, priorityLevel, dueDate } = req.body;
+        const { status, reminder, notes, title, description, priorityLevel, dueDate, inTrash } = req.body;
         // check if the respective attribute is provided and unpack it in the updatedData (if it is provded, else do not unpack)
         const updatedData = {
             ...(status != undefined && { status }),
@@ -81,7 +81,8 @@ const updateToDoListTask = async (req, res) => {
             ...(title != undefined && { title }),
             ...(description != undefined && { description }),
             ...(priorityLevel != undefined && { priorityLevel }),
-            ...(dueDate != undefined && { dueDate })
+            ...(dueDate != undefined && { dueDate }),
+            ...(inTrash != undefined && { inTrash })
         };
 
         if (!mongoose.Types.ObjectId.isValid(id)) {

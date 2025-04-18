@@ -63,7 +63,16 @@ export default function ToDoDetail() {
         setSelectedTodo(updatedTodo);
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
+        const response = await axios.put(`${apiUrl}/todos/${selectedTodo.id}`, {
+            ...selectedTodo,
+            inTrash: true,
+        });
+
+        if (response.status !== 200) {
+            throw new Error("Failed to delete todo");
+        }
+
         const filteredTodos = todos.filter((todo) => todo.id !== selectedTodo.id);
         setSelectedTodo(undefined);
         setTodos(filteredTodos);
