@@ -41,7 +41,7 @@ const getKanbanBoard = async (req, res) => {
         const {projectId} = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(projectId)) {
-            return res.status(404).json({ success: false, message: "Project not found!" });
+            return res.status(404).json({ success: false, message: "Project was not found!" });
         } 
 
         const kanbanBoardTasks = await getKanbanBoardByProjectId(projectId);
