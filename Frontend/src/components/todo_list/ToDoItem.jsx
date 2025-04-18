@@ -36,14 +36,13 @@ const ToDoItem = ( { todo, onSelect } ) => {
 
     return (
         <div
-            key={todo.id}
             className="flex items-center gap-4 p-4 border-b border-[#2e2d2d] hover:bg-[#2e2d2d] group transition-colors cursor-pointer"
             onClick={() => setSelectedTodo(todo)}
         >
             <div className="relative">
                 <input
                     type="checkbox"
-                    checked={todo.completed}
+                    checked={todo.completed === "completed"}
                     onChange={() => onSelect(todo.id)}
                     className={`w-5 h-5 rounded-sm appearance-none border-2 ${getPriorityColor(todo.priority)} 
                   checked:bg-current checked:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-offset-[#1a1a1a] transition-colors cursor-pointer`}
@@ -62,7 +61,7 @@ const ToDoItem = ( { todo, onSelect } ) => {
                     </svg>
                 )}
             </div>
-            <span className={`flex-1 font-normal text-sm ${todo.completed ? 'line-through text-gray-500' : ''}`}>
+            <span className={`flex-1 font-normal text-sm ${todo.completed === "completed" ? 'line-through text-gray-500' : ''}`}>
                 {todo.title}
             </span>
             {todo.dueDate && (

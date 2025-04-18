@@ -14,6 +14,42 @@ const ToDoListTask = require("../models/toDoListTask");
  * @return {Promise<Array>} - A promise that resolves to an array of todos
  */
 
+const createNewToDoListTask = async (userId, taskData) => {
+    try {
+        const todoList = await ToDoList.findOne({ userId });
+
+        if (!todoList) {
+            throw new Error("Todo list not found for this user");
+        }
+
+        const toDoListId = todoList._id;
+
+        const parsedReminder = taskData.reminder ? new Date(taskData.reminder) : null;
+        const parsedDueDate = taskData.dueDate ? new Date(taskData.dueDate) : null;
+
+        if (parsedDueDate && isNaN(parsedDueDate)) {
+            throw new Error("Invalid dueDate format");
+        }
+        if (parsedReminder && isNaN(parsedReminder)) {
+            throw new Error("Invalid reminder format");
+        }
+
+        const newTask = await ToDoListTask.create({
+            ...taskData,
+            toDoListId,
+            reminder: parsedReminder,
+            dueDate: parsedDueDate
+        });
+
+        console.log("newTask", newTask);
+        return newTask;
+    } catch (error) {
+        console.error("Caught error while creating task:", error);
+        throw new Error("Error creating new task: " + error.message);
+    }
+};
+
+
 const getAllToDosByUserId = async (userId) => {
   try {
     const todoList = await ToDoList.findOne({ userId });
@@ -117,6 +153,7 @@ const completeTodoById = async (todoId) => {
 
 
 module.exports = {
+    createNewToDoListTask,
     getAllToDosByUserId,
     getCompletedTodosByUserId,
     getTrashedTodosByUserId,

@@ -8,6 +8,9 @@ import {
 } from 'lucide-react';
 import ToDoItem from './ToDoItem';
 import { useToDoContext } from '../../contexts/todoContext';
+import axios from 'axios';
+const apiUrl = import.meta.env.VITE_API_URL;
+const userId = import.meta.env.VITE_USER_ID;
 
 function ToDoList() {
     const { todos, setTodos } = useToDoContext();
@@ -18,19 +21,39 @@ function ToDoList() {
 
     const handleSelectTodoCheckbox = (id) => {
         setTodos(todos.map(t =>
-            t.id === id ? { ...t, completed: !t.completed } : t
+            t.id === id ? { ...t, completed: t.completed === "completed" ? "pending" : "completed" } : t
         ))
     }
 
-    const handleAddTodo = () => {
+    const handleAddTodo = async () => {
+        const response = await axios.post(`${apiUrl}/todos/${userId}`, {
+            title: newTodo,
+            status: "pending",
+            priorityLevel: selectedPriority,
+            dueDate: selectedDate,
+            reminder: selectedTime,
+            description: null,
+            notes: null,
+            inTrash: false,
+        });
+
+        if (response.status !== 201) {
+            throw new Error("Failed to add todo");
+        }
+
+        const { data } = response.data;
+
         if (newTodo.trim()) {
             setTodos([...todos, {
-                id: Date.now(),
-                title: newTodo,
-                completed: false,
-                priority: selectedPriority,
-                dueDate: selectedDate || null,
-                reminderTime: selectedTime || null
+                id: data._id,
+                title: data.title,
+                completed: data.status,
+                priority: data.priorityLevel,
+                dueDate: data.dueDate,
+                reminderTime: data.reminder,
+                description: data.description,
+                notes: data.notes,
+                inTrash: data.inTrash,
             }]);
             setNewTodo("");
             setSelectedPriority(null);

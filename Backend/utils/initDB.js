@@ -46,7 +46,7 @@ const dummyTasks = [
         description: "Finish writing the project proposal document and submit it",
         priorityLevel: "high",
         dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-        reminder: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+        reminder: null, // 2 days from now
         notes: "Check with team for any last-minute changes"
     },
     {
@@ -75,7 +75,7 @@ const dummyTasks = [
         description: "30-minute run in the park",
         priorityLevel: "medium",
         dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-        reminder: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12 hours from now
+        reminder: null, // 12 hours from now
         inTrash: true
     }
 ]

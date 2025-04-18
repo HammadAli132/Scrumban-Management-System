@@ -23,7 +23,6 @@ const toDoListTaskSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true
     },
     priorityLevel: {
         type: String,
@@ -32,7 +31,6 @@ const toDoListTaskSchema = new mongoose.Schema({
     },
     dueDate: {
         type: Date,
-        required: true
     },
     inTrash: {
         type: Boolean,

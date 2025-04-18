@@ -11,12 +11,31 @@ export default function ToDoDetail() {
     const [time, setTime] = useState('');
     const [priority, setPriority] = useState('');
 
+    // Helper function to format date for input[type="date"]
+    const formatDateForInput = (date) => {
+        if (!date) return '';
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    // Helper function to format time for input[type="time"] (24-hour format)
+    const formatTimeForInput = (date) => {
+        if (!date) return '';
+        const d = new Date(date);
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
+
     useEffect(() => {
         if (selectedTodo) {
             setTitle(selectedTodo.title || '');
             setDescription(selectedTodo.description || '');
-            setDueDate(selectedTodo.dueDate || 'No Due Date');
-            setTime(selectedTodo.reminderTime || 'No Reminder');
+            setDueDate(formatDateForInput(selectedTodo.dueDate) || '');
+            setTime(formatTimeForInput(selectedTodo.reminderTime) || '');
             setPriority(selectedTodo.priority || '');
         }
     }, [selectedTodo]);
@@ -30,23 +49,30 @@ export default function ToDoDetail() {
     }
 
     const handleSave = () => {
-        selectedTodo.title = title;
-        selectedTodo.description = description;
-        selectedTodo.dueDate = dueDate;
-        selectedTodo.reminderTime = time;
-        selectedTodo.priority = priority;
+        // Create updated todo object
+        // Convert dueDate and time back to ISO strings.
+        const updatedTodo = {
+            ...selectedTodo,
+            title,
+            description,
+            dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+            // Use the dueDate and time to create a new ISO date string for reminder.
+            reminder: time ? new Date(`${dueDate}T${time}Z`).toISOString() : null,
+            priority
+        };
 
-        setSelectedTodo({ ...selectedTodo });
+        // Update the todos array
+        const updatedTodos = todos.map(todo => 
+            todo.id === selectedTodo.id ? updatedTodo : todo
+        );
+
+        setTodos(updatedTodos);
+        setSelectedTodo(updatedTodo);
     };
 
     const handleDelete = () => {
-        // first we filter the selected todo from the todos array
         const filteredTodos = todos.filter((todo) => todo.id !== selectedTodo.id);
-
-        // then we set the selected todo to undefined
         setSelectedTodo(undefined);
-
-        // finally we set the todos array to the filtered array
         setTodos(filteredTodos);
     };
 
@@ -63,7 +89,7 @@ export default function ToDoDetail() {
             default:
                 return 'text-gray-400';
         }
-    }
+    };
 
     return (
         <div className="flex flex-col w-1/3 border-l border-[#2e2d2d] bg-[#1c1c1c] text-gray-200">
@@ -85,7 +111,7 @@ export default function ToDoDetail() {
                             value={time}
                             onChange={(e) => setTime(e.target.value)}
                             className={`${inputClass} w-full`}
-                            placeholder="Reminder"
+                            placeholder="Reminder Time"
                         />
                     </div>
                     <div className="flex items-center space-x-2 w-1/3 justify-end">
