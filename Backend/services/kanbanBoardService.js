@@ -18,10 +18,20 @@ const getKanbanBoardByProjectId = async (projectId) => {
     }
 };
 
-const updateKanbanBoardTitleById = async (kanbanBoardId, updateData) => {
+const updateKanbanBoardTitleById = async (kanbanBoardId, updatedTitle) => {
     try {
-        
+        const updatedKanbanBoard = await KanbanBoard.findOneAndUpdate(
+            {_id: kanbanBoardId},
+            {title: updatedTitle},
+            {new: true}
+        );
+
+        if (!updatedKanbanBoard) {
+            throw new Error("Kanban Board not found");
+        }
+
+        return updatedKanbanBoard;
     } catch (error) {
-        
+        throw new Error("Error updating kanban board title: " + error.message);
     }
-}
+};
