@@ -45,40 +45,43 @@ const dummyTasks = [
         title: "Complete project proposal",
         description: "Finish writing the project proposal document and submit it",
         priorityLevel: "high",
-        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-        reminder: null, // 2 days from now
+        dueDate: "2023-11-05",  // YYYY/MM/DD (formerly 05/11/2023)
+        reminder: null,
         notes: "Check with team for any last-minute changes"
     },
     {
         title: "Buy groceries",
         description: "Milk, eggs, bread, fruits, and vegetables",
         priorityLevel: "medium",
-        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-        notes: "Don't forget the organic options"
+        dueDate: "2023-11-03",   // YYYY/MM/DD (formerly 03/11/2023)
+        notes: "Don't forget the organic options",
+        reminder: "09:00"        // Time unchanged (HH:MM)
     },
     {
         title: "Schedule dentist appointment",
         description: "Call Dr. Smith's office to schedule checkup",
         priorityLevel: "low",
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        status: "completed"
+        dueDate: "2023-11-09",   // YYYY/MM/DD (formerly 09/11/2023)
+        status: "completed",
+        reminder: "14:30"        // Time unchanged
     },
     {
         title: "Prepare for meeting",
         description: "Review presentation slides and prepare talking points",
         priorityLevel: "high",
-        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-        notes: "Focus on Q3 results and projections"
+        dueDate: "2023-11-03",   // YYYY/MM/DD (formerly 03/11/2023)
+        notes: "Focus on Q3 results and projections",
+        reminder: "16:45"        // Time unchanged
     },
     {
         title: "Exercise",
         description: "30-minute run in the park",
         priorityLevel: "medium",
-        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-        reminder: null, // 12 hours from now
+        dueDate: "2023-11-03",   // YYYY/MM/DD (formerly 03/11/2023)
+        reminder: "07:30",       // Time unchanged
         inTrash: true
     }
-]
+];
 
 async function initDB() {
     try {

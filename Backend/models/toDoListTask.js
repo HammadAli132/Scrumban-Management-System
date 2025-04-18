@@ -12,7 +12,7 @@ const toDoListTaskSchema = new mongoose.Schema({
         default: "pending"
     },
     reminder: {
-        type: Date
+        type: String
     },
     notes: {
         type: String
@@ -30,7 +30,7 @@ const toDoListTaskSchema = new mongoose.Schema({
         default: 'medium'
     },
     dueDate: {
-        type: Date,
+        type: String,
     },
     inTrash: {
         type: Boolean,

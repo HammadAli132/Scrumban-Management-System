@@ -24,24 +24,11 @@ const createNewToDoListTask = async (userId, taskData) => {
 
         const toDoListId = todoList._id;
 
-        const parsedReminder = taskData.reminder ? new Date(taskData.reminder) : null;
-        const parsedDueDate = taskData.dueDate ? new Date(taskData.dueDate) : null;
-
-        if (parsedDueDate && isNaN(parsedDueDate)) {
-            throw new Error("Invalid dueDate format");
-        }
-        if (parsedReminder && isNaN(parsedReminder)) {
-            throw new Error("Invalid reminder format");
-        }
-
         const newTask = await ToDoListTask.create({
             ...taskData,
             toDoListId,
-            reminder: parsedReminder,
-            dueDate: parsedDueDate
         });
 
-        console.log("newTask", newTask);
         return newTask;
     } catch (error) {
         console.error("Caught error while creating task:", error);

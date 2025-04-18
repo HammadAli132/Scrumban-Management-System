@@ -11,33 +11,16 @@ export default function ToDoDetail() {
     const [time, setTime] = useState('');
     const [priority, setPriority] = useState('');
 
-    // Helper function to format date for input[type="date"]
-    const formatDateForInput = (date) => {
-        if (!date) return '';
-        const d = new Date(date);
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-
-    // Helper function to format time for input[type="time"] (24-hour format)
-    const formatTimeForInput = (date) => {
-        if (!date) return '';
-        const d = new Date(date);
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        return `${hours}:${minutes}`;
-    };
-
     useEffect(() => {
         if (selectedTodo) {
             setTitle(selectedTodo.title || '');
             setDescription(selectedTodo.description || '');
-            setDueDate(formatDateForInput(selectedTodo.dueDate) || '');
-            setTime(formatTimeForInput(selectedTodo.reminderTime) || '');
+            setDueDate(selectedTodo.dueDate || '');
+            setTime(selectedTodo.reminderTime || '');
             setPriority(selectedTodo.priority || '');
         }
+        console.log("Due Date: ", dueDate);
+        console.log("Reminder: ", time);
     }, [selectedTodo]);
 
     if (!selectedTodo) {
@@ -49,15 +32,12 @@ export default function ToDoDetail() {
     }
 
     const handleSave = () => {
-        // Create updated todo object
-        // Convert dueDate and time back to ISO strings.
         const updatedTodo = {
             ...selectedTodo,
             title,
             description,
-            dueDate: dueDate ? new Date(dueDate).toISOString() : null,
-            // Use the dueDate and time to create a new ISO date string for reminder.
-            reminder: time ? new Date(`${dueDate}T${time}Z`).toISOString() : null,
+            dueDate,
+            reminderTime: time,
             priority
         };
 
