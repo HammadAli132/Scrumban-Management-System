@@ -34,14 +34,12 @@ export default function ToDoDetail() {
 
     const handleSave = async () => {
         const response = await axios.put(`${apiUrl}/todos/${selectedTodo.id}`, {
+            ...selectedTodo,
             title,
-            status: selectedTodo.completed,
-            reminder: time,
-            notes: null,
             description,
-            priorityLevel: priority,
             dueDate,
-            inTrash: false,
+            reminder: time,
+            priorityLevel: priority,
         });
 
         if (response.status !== 200) {

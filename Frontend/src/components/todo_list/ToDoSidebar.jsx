@@ -9,11 +9,11 @@ import {
 } from "lucide-react";
 import { useToDoContext } from "../../contexts/todoContext";
 
-const NavItem = ({ icon, label, count, color = "text-white" }) => (
+const NavItem = ({ icon, label, count, color = "text-white", link }) => (
   <li className="group">
     <a
-      href="#"
-      className={`flex items-center gap-3 px-3 py-2 hover:bg-[#232323] rounded-lg ${color}`}
+      href={link}
+      className={`flex items-center gap-3 px-3 py-2 hover:bg-[#232323] rounded-lg ${color} cursor-pointer`}
     >
       {icon}
       <span className="flex-grow font-normal text-[14px]">{label}</span>
@@ -42,8 +42,8 @@ const ToDoSidebar = () => {
 
         {/* Bottom Items */}
         <ul className="lg:mt-auto space-y-1 lg:w-full flex lg:flex-col flex-row lg:gap-0 gap-4">
-          <NavItem icon={<CheckSquare size={20} color="#a7a7a7" />} label="Completed" />
-          <NavItem icon={<Trash2 size={20} color="#a7a7a7" />} label="Trash" />
+          <NavItem icon={<CheckSquare size={20} color="#a7a7a7" />} label="Completed" link={"/to-do-list/completed"} />
+          <NavItem icon={<Trash2 size={20} color="#a7a7a7" />} label="Trash" link={"/to-do-list/deleted"} />
           <NavItem icon={<HelpCircle size={20} color="#a7a7a7" />} label="Help" />
           <NavItem icon={<Bell size={20} color="#a7a7a7" />} label="Notifications" />
         </ul>

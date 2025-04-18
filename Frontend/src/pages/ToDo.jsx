@@ -5,6 +5,7 @@ import ToDoList from "../components/todo_list/ToDoList";
 import ToDoSidebar from "../components/todo_list/ToDoSidebar";
 import { ToDoListContext } from "../contexts/todoContext";
 import axios from 'axios';
+import { Outlet } from 'react-router-dom';
 const apiUrl = import.meta.env.VITE_API_URL;
 const userId = import.meta.env.VITE_USER_ID;
 
@@ -46,8 +47,7 @@ export default function ToDo() {
         <ToDoListContext.Provider value={{ todos, setTodos, selectedTodo, setSelectedTodo }}>
             <div className="flex flex-row w-full h-full">
                 <ToDoSidebar />
-                <ToDoList />
-                <ToDoDetail />
+                <Outlet />
             </div>
         </ToDoListContext.Provider>
     )
