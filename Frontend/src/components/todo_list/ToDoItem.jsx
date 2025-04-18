@@ -43,6 +43,9 @@ const ToDoItem = ( { todo, onSelect } ) => {
                 <input
                     type="checkbox"
                     checked={todo.completed === "completed"}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
                     onChange={() => onSelect(todo.id)}
                     className={`w-5 h-5 rounded-sm appearance-none border-2 ${getPriorityColor(todo.priority)} 
                   checked:bg-current checked:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-offset-[#1a1a1a] transition-colors cursor-pointer`}

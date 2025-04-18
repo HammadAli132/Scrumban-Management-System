@@ -35,8 +35,8 @@ const CompletedToDoItem = ({ todo, onSelect }) => {
                 <input
                     type="checkbox"
                     checked={todo.completed === "completed"}
-                    onChange={() => onSelect(todo.id)}
-                    className={`w-5 h-5 rounded-sm appearance-none border-2 ${getPriorityColor(todo.priority)} 
+                    onChange={() => onSelect(todo._id)}
+                    className={`w-5 h-5 rounded-sm appearance-none border-2 ${getPriorityColor(todo.priorityLevel)} 
                         checked:bg-current checked:border-transparent focus:outline-none focus:ring-2 
                         focus:ring-offset-2 focus:ring-offset-[#1a1a1a] transition-colors cursor-pointer`}
                 />
@@ -66,7 +66,7 @@ const CompletedToDoItem = ({ todo, onSelect }) => {
                     </div>
                     {todo.reminderTime && (
                         <div className="text-xs text-gray-400">
-                            {formatTime(todo.reminderTime)}
+                            {formatTime(todo.reminder)}
                         </div>
                     )}
                 </div>

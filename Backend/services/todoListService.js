@@ -46,7 +46,11 @@ const getAllToDosByUserId = async (userId) => {
     if (!todos) {
       throw new Error("No todos found for this user");
     }
-    return todos;
+
+    // returning only those todos which are not in trash or are not completed
+    const filteredTodos = todos.filter(todo => !todo.inTrash && todo.status !== "completed");
+
+    return filteredTodos;
   } catch (error) {
     throw new Error("Error getting todos: " + error.message);
   }
