@@ -8,7 +8,6 @@ const kanbanBoardTaskSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true,
         trim: true
     },
     priorityLevel: {
@@ -17,8 +16,7 @@ const kanbanBoardTaskSchema = new mongoose.Schema({
         default: 'medium'
     },
     dueDate: {
-        type: Date,
-        required: true
+        type: Date
     },
     swimLane: {
         type: String,

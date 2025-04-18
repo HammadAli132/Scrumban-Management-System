@@ -17,3 +17,11 @@ const getKanbanBoardByProjectId = async (projectId) => {
         throw new Error("Error getting kanban board: " + error.message);
     }
 };
+
+const updateKanbanBoardTitleById = async (kanbanBoardId, updateData) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
