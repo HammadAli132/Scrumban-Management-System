@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
-const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById } = require("../services/kanbanBoardService");
+const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById, updateKanbanBoardTaskById } = require("../services/kanbanBoardService");
 
 const createKanbanBoardTask = async (req, res) => {
     try {
         const {projectId} = req.params;
+
         const { 
             title, 
             description, 
@@ -72,3 +73,39 @@ const updateKanbanBoardTitle = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
+const updateKanbanBoardTask = async (req, res) => {
+    try {
+        const {taskId} = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(taskId)) {
+            return res.status(404).json({ success: false, message: "Task not found!" });
+        }
+
+        const { 
+            title, 
+            description, 
+            priorityLevel, 
+            dueDate, 
+            swimLane, 
+            sprintId, 
+            userId 
+        } = req.body;
+
+        const updateData = {
+            ...(title != undefined && {title}),
+            ...(description != undefined && {description}),
+            ...(priorityLevel != undefined && {priorityLevel}),
+            ...(dueDate != undefined && {dueDate}),
+            ...(swimLane != undefined && {swimLane}),
+            ...(sprintId != undefined && {sprintId}),
+            ...(userId != undefined && {userId})
+        };
+
+        const updatedTask = await updateKanbanBoardTaskById(taskId, updateData);
+        
+        res.status(200).json({success: true, data: updatedTask});
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+}
