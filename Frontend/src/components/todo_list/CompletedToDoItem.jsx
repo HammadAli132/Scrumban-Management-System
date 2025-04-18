@@ -1,8 +1,4 @@
-import { useToDoContext } from "../../contexts/todoContext";
-
-const ToDoItem = ( { todo, onSelect } ) => {
-    const { setSelectedTodo } = useToDoContext();
-
+const CompletedToDoItem = ({ todo, onSelect }) => {
     const getPriorityColor = (priority) => {
         switch (priority) {
             case 'high': return 'text-red-500 border-red-500';
@@ -33,22 +29,16 @@ const ToDoItem = ( { todo, onSelect } ) => {
         });
     };
 
-
     return (
-        <div
-            className="flex items-center gap-4 p-4 border-b border-[#2e2d2d] hover:bg-[#2e2d2d] group transition-colors cursor-pointer"
-            onClick={() => setSelectedTodo(todo)}
-        >
+        <div className="flex items-center gap-4 p-4 border-b border-[#2e2d2d] hover:bg-[#2e2d2d] group transition-colors cursor-pointer">
             <div className="relative">
                 <input
                     type="checkbox"
                     checked={todo.completed === "completed"}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                    onChange={() => onSelect(todo.id)}
-                    className={`w-5 h-5 rounded-sm appearance-none border-2 ${getPriorityColor(todo.priority)} 
-                  checked:bg-current checked:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-offset-[#1a1a1a] transition-colors cursor-pointer`}
+                    onChange={() => onSelect(todo._id)}
+                    className={`w-5 h-5 rounded-sm appearance-none border-2 ${getPriorityColor(todo.priorityLevel)} 
+                        checked:bg-current checked:border-transparent focus:outline-none focus:ring-2 
+                        focus:ring-offset-2 focus:ring-offset-[#1a1a1a] transition-colors cursor-pointer`}
                 />
                 {todo.completed && (
                     <svg
@@ -64,9 +54,11 @@ const ToDoItem = ( { todo, onSelect } ) => {
                     </svg>
                 )}
             </div>
-            <span className={`flex-1 font-normal text-sm ${todo.completed === "completed" ? 'line-through text-gray-500' : ''}`}>
+
+            <span className="flex-1 font-normal text-sm line-through text-gray-500">
                 {todo.title}
             </span>
+
             {todo.dueDate && (
                 <div className="text-right">
                     <div className="font-bold text-sm text-gray-300">
@@ -74,13 +66,13 @@ const ToDoItem = ( { todo, onSelect } ) => {
                     </div>
                     {todo.reminderTime && (
                         <div className="text-xs text-gray-400">
-                            {formatTime(todo.reminderTime)}
+                            {formatTime(todo.reminder)}
                         </div>
                     )}
                 </div>
             )}
         </div>
-    )
-}
+    );
+};
 
-export default ToDoItem;
+export default CompletedToDoItem;

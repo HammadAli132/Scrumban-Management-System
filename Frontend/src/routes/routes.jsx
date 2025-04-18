@@ -1,6 +1,6 @@
 import App from "../App.jsx";
-import CompletedToDos from "../components/todo_list/CompletedToDos.jsx";
-import DeletedToDos from "../components/todo_list/DeletedToDos.jsx";
+import CompletedToDoList from "../components/todo_list/CompletedToDoList.jsx";
+import DeletedToDoList from "../components/todo_list/DeletedToDoList.jsx";
 import ToDoMain from "../components/todo_list/ToDoMain.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import KanbanBoard from "../pages/KanbanBoard.jsx";
@@ -31,11 +31,11 @@ const routes = [
                     },
                     {
                         path: "/to-do-list/completed",
-                        element: <CompletedToDos />,
+                        element: <CompletedToDoList />,
                     },
                     {
                         path: "/to-do-list/deleted",
-                        element: <DeletedToDos />,
+                        element: <DeletedToDoList />,
                     }
                 ],
             },

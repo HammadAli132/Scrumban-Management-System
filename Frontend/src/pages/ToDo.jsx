@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import ToDoDetail from "../components/todo_list/ToDoDetail";
-import ToDoList from "../components/todo_list/ToDoList";
 import ToDoSidebar from "../components/todo_list/ToDoSidebar";
 import { ToDoListContext } from "../contexts/todoContext";
 import axios from 'axios';
