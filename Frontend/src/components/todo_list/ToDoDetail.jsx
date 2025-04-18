@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Flag as Flag2 } from 'lucide-react';
 import { useToDoContext } from '../../contexts/todoContext';
+const apiUrl = import.meta.env.VITE_API_URL;
+const userId = import.meta.env.VITE_USER_ID;
+import axios from 'axios';
 
 export default function ToDoDetail() {
     const { selectedTodo, setSelectedTodo, todos, setTodos } = useToDoContext();
@@ -19,8 +22,6 @@ export default function ToDoDetail() {
             setTime(selectedTodo.reminderTime || '');
             setPriority(selectedTodo.priority || '');
         }
-        console.log("Due Date: ", dueDate);
-        console.log("Reminder: ", time);
     }, [selectedTodo]);
 
     if (!selectedTodo) {
@@ -31,7 +32,22 @@ export default function ToDoDetail() {
         );
     }
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        const response = await axios.put(`${apiUrl}/todos/${selectedTodo.id}`, {
+            title,
+            status: selectedTodo.completed,
+            reminder: time,
+            notes: null,
+            description,
+            priorityLevel: priority,
+            dueDate,
+            inTrash: false,
+        });
+
+        if (response.status !== 200) {
+            throw new Error("Failed to update todo");
+        }
+
         const updatedTodo = {
             ...selectedTodo,
             title,
