@@ -36,11 +36,11 @@ const updateKanbanBoardTitleById = async (kanbanBoardId, updatedTitle) => {
     }
 };
 
-const updateKanbanBoardTaskTitleById = async (taskId, updatedTitle) => {
+const updateKanbanBoardTaskById = async (taskId, updateData) => {
     try {
         const updatedTask = await KanbanBoardTask.findOneAndUpdate(
             {_id: taskId},
-            {title: updatedTitle},
+            updateData,
             {new: true}
         );
 
@@ -50,7 +50,7 @@ const updateKanbanBoardTaskTitleById = async (taskId, updatedTitle) => {
 
         return updatedTask;
     } catch (error) {
-        throw new Error("Error updating kanban board task title: " + error.message);
+        throw new Error("Error updating kanban board task: " + error.message);
     }
 };
 
@@ -74,3 +74,4 @@ const createKanbanBoardTaskByProjectId = async (projectId, taskData) => {
         throw new Error("Error creating kanban board task: " + error.message);
     }
 };
+
