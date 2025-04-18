@@ -5,6 +5,10 @@ const createKanbanBoardTask = async (req, res) => {
     try {
         const {projectId} = req.params;
 
+        if (!mongoose.Types.ObjectId.isValid(projectId)) {
+            return res.status(404).json({ success: false, message: "Project not found!" });
+        } 
+
         const { 
             title, 
             description, 
@@ -24,10 +28,6 @@ const createKanbanBoardTask = async (req, res) => {
             ...(sprintId != undefined && {sprintId}),
             ...(userId != undefined && {userId})
         };
-
-        if (!mongoose.Types.ObjectId.isValid(projectId)) {
-            return res.status(404).json({ success: false, message: "Project not found!" });
-        } 
 
         const newKanbanBoardTask = await createKanbanBoardTaskByProjectId(projectId, taskData);
 
@@ -108,4 +108,11 @@ const updateKanbanBoardTask = async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
-}
+};
+
+module.exports = {
+    createKanbanBoardTask,
+    getKanbanBoard,
+    updateKanbanBoardTitle,
+    updateKanbanBoardTask
+};
