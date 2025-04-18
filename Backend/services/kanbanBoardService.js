@@ -75,3 +75,9 @@ const createKanbanBoardTaskByProjectId = async (projectId, taskData) => {
     }
 };
 
+module.exports = {
+    getKanbanBoardByProjectId,
+    updateKanbanBoardTitleById,
+    updateKanbanBoardTaskById,
+    createKanbanBoardTaskByProjectId
+};
