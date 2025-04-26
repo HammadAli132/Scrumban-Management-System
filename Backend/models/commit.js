@@ -12,7 +12,10 @@ const commitSchema = new mongoose.Schema({
         required: true
     },
     status: {
-
+        type: String,
+        enum: ['approved', 'pending'],
+        default: 'pending',
+        required: true
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
