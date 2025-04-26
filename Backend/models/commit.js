@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const commitSchema = new mongoose.Schema({
+    message: {
+        type: String,
+        required: true,
+        trim: true
+    },
     hash: {
         type: String,
         required: true,
