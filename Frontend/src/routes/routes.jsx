@@ -9,6 +9,7 @@ import Projects from "../pages/Projects.jsx";
 import ToDo from "../pages/ToDo.jsx";
 import Repository from "../pages/Repository.jsx";
 import DashboardLayout from "../components/dashboard_layout/DashboardLayout.jsx";
+import FileView from "../pages/FileView.jsx";
 
 const routes = [
     {
@@ -60,6 +61,12 @@ const routes = [
                 path: "/project/:projectid/repository/:repositoryid",
                 element: <DashboardLayout>
                     <Repository />
+                </DashboardLayout>,
+            },
+            {
+                path: "/project/:projectid/repository/:repositoryid/file/:fileid",
+                element: <DashboardLayout>
+                    <FileView />
                 </DashboardLayout>,
             }
         ],
