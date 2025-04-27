@@ -103,11 +103,34 @@ const deleteKanbanBoardTaskById = async (taskId) => {
     }
 };
 
+const addCommentToKanbanTask = async (taskId, userId, text) => {
+    try {
+        const task = await KanbanBoardTask.findById(taskId);
+
+        if (!task) {
+            throw new Error("Kanban Board Task not found");
+        }
+
+        const newComment = await Comment.create({
+            text,
+            userId,
+            kanbanBoardTaskId: taskId
+        });
+
+        await newComment.populate('userId', 'username');
+
+        return newComment;
+    } catch (error) {
+        throw new Error("Error adding comment to task: " + error.message);
+    }
+};
+
 module.exports = {
     getKanbanBoardByProjectId,
     updateKanbanBoardTitleById,
     updateKanbanBoardTaskById,
     createKanbanBoardTaskByProjectId,
     getKanbanBoardIdByProjectId,
-    deleteKanbanBoardTaskById
+    deleteKanbanBoardTaskById,
+    addCommentToKanbanTask
 };
