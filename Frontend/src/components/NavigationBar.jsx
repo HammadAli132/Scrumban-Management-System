@@ -1,6 +1,6 @@
 import React from 'react';
 import avatar from '../assets/avatar-659651_640.png';
-import { BellDot, CircleEllipsis, Kanban, LayoutDashboard, ListTodo } from 'lucide-react';
+import { BellDot, CircleEllipsis, Kanban, LayoutDashboard, ListTodo, FolderGit2, PanelsTopLeft } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 
 const Icons = [
@@ -13,8 +13,31 @@ const Icons = [
 
 export default function NavigationBar() {
     const [activeIcon, setActiveIcon] = React.useState(0);
-    const { projectId } = useParams();
+    const { projectid } = useParams();
     const projectIdState = useLocation().state?.projectId || null;
+
+    const location = useLocation();
+    React.useEffect(() => {
+        const currentPath = location.pathname;
+        let iconIndex = 0;
+        if (currentPath.includes('/to-do-list')) {
+            iconIndex = 1;
+        } else if (currentPath.includes('/project')) {
+            if (currentPath.includes('/kanban')) {
+                iconIndex = 3;
+            } else if (currentPath.includes('/repository')) {
+                iconIndex = 4;
+            } else {
+                iconIndex = 2; // Default to overview if no specific route is matched
+            }
+        }
+        else if (currentPath.includes('/notifications')) {
+            iconIndex = 5;
+        } else if (currentPath.includes('/about-us')) {
+            iconIndex = 6;
+        }
+        setActiveIcon(iconIndex);
+    }, [location.pathname]);
 
     return (
         <div className="py-3 lg:flex-shrink-0 lg:h-screen lg:sticky lg:top-0 lg:left-0 bg-[#242424]
@@ -37,21 +60,41 @@ export default function NavigationBar() {
                 {/* To-Do List Icon */}
                 <Link
                     to="/to-do-list"
-                    state={{ projectId: projectId }}
+                    state={{ projectId: projectid }}
                     className="cursor-pointer hover:bg-[#2f2f2f] rounded-lg p-1 flex items-center justify-center"
                     onClick={() => setActiveIcon(1)}
                 >
                     <ListTodo size={25} color={activeIcon === 1 ? '#fff' : '#a7a7a7'} />
                 </Link>
 
-                {/* Kanban Icon (conditionally shown) */}
-                {(projectId || projectIdState) && (
+                {/* Overview Icon (conditionally shown) */}
+                {(projectid || projectIdState) && (
                     <Link
-                        to={`/kanban-board/${(projectId || projectIdState)}`}
+                        to={`/project/${(projectid || projectIdState)}`}
                         className="cursor-pointer hover:bg-[#2f2f2f] rounded-lg p-1 flex items-center justify-center"
                         onClick={() => setActiveIcon(2)}
                     >
-                        <Kanban size={25} color={activeIcon === 2 ? '#fff' : '#a7a7a7'} />
+                        <PanelsTopLeft size={25} color={activeIcon === 2 ? '#fff' : '#a7a7a7'} />
+                    </Link>
+                )}
+                {/* Kanban Icon (conditionally shown) */}
+                {(projectid || projectIdState) && (
+                    <Link
+                        to={`/project/${(projectid || projectIdState)}/kanban/2`}
+                        className="cursor-pointer hover:bg-[#2f2f2f] rounded-lg p-1 flex items-center justify-center"
+                        onClick={() => setActiveIcon(3)}
+                    >
+                        <Kanban size={25} color={activeIcon === 3 ? '#fff' : '#a7a7a7'} />
+                    </Link>
+                )}
+                {/* Repository Icon (conditionally shown) */}
+                {(projectid || projectIdState) && (
+                    <Link
+                        to={`/project/${(projectid || projectIdState)}/repository/2`}
+                        className="cursor-pointer hover:bg-[#2f2f2f] rounded-lg p-1 flex items-center justify-center"
+                        onClick={() => setActiveIcon(4)}
+                    >
+                        <FolderGit2 size={25} color={activeIcon === 4 ? '#fff' : '#a7a7a7'} />
                     </Link>
                 )}
             </div>
@@ -63,9 +106,9 @@ export default function NavigationBar() {
                         key={index}
                         to={index === 0 ? '/notifications' : '/about-us'}
                         className="cursor-pointer hover:bg-[#2f2f2f] rounded-lg p-1 flex items-center justify-center"
-                        onClick={() => setActiveIcon(index + 3)}
+                        onClick={() => setActiveIcon(index + 5)}
                     >
-                        <Icon size={25} color={activeIcon === (index + 3) ? '#fff' : '#a7a7a7'} />
+                        <Icon size={25} color={activeIcon === (index + 5) ? '#fff' : '#a7a7a7'} />
                     </Link>
                 ))}
             </div>

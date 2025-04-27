@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom"
 
 function Projects() {
-    const { projectId } = useParams();
+    const { projectid } = useParams();
     return (
-        <div>Project has id {projectId}</div>
+        <div>Project has id {projectid}</div>
     )
 }
 
