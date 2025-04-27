@@ -21,7 +21,7 @@ const sprintSchema = new mongoose.Schema({
         ref: 'project', 
         required: true
     }
-}, {timestamps});
+}, {timestamps: true});
 
 const Sprint = mongoose.model("Sprint", sprintSchema);
 
