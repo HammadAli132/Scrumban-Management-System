@@ -6,7 +6,8 @@ const KanbanBoard = require("../models/kanbanBoard.js");
 const KanbanBoardTask = require("../models/kanbanBoardTask.js");
 const Sprint = require("../models/sprint.js");
 const CodeRepository = require("../models/codeRepository.js");
-const Comment = require("../models/comment.js")
+const Comment = require("../models/comment.js");
+const MeetingNote = require('../models/meetingNote.js');
 
 const dummyUsers = [
     {
@@ -262,6 +263,49 @@ const dummyComments = [
     }
 ];
 
+const dummyMeetingNotes = [
+    {
+        title: "Kickoff Meeting Notes",
+        content: "Discussed project scope, timelines, and deliverables. Team assigned roles and responsibilities. Next meeting scheduled for Friday."
+    },
+    {
+        title: "Design Review",
+        content: "Reviewed initial wireframes. Feedback: simplify navigation, increase contrast for accessibility. Action items: update mockups by next week."
+    },
+    {
+        title: "Sprint Planning",
+        content: "Prioritized backlog items for Sprint 2. Estimated 35 story points. Focus on authentication module and dashboard components."
+    },
+    {
+        title: "Client Feedback Session",
+        content: "Client likes overall direction but requested changes to color scheme. Need to adjust primary color to match brand guidelines."
+    },
+    {
+        title: "Retrospective Meeting",
+        content: "What went well: good collaboration. Improvements needed: better estimation. Action items: implement pair programming for complex tasks."
+    },
+    {
+        title: "Technical Discussion",
+        content: "Decided to use React for frontend and Node.js for backend. Database choice: MongoDB. Need to finalize API specs."
+    },
+    {
+        title: "QA Status Update",
+        content: "Current test coverage at 75%. Critical bugs found in checkout flow. Developers to prioritize fixes this sprint."
+    },
+    {
+        title: "Deployment Planning",
+        content: "Scheduled production deployment for next Tuesday at 2AM. Rollback plan in place. All teams on standby."
+    },
+    {
+        title: "Budget Review",
+        content: "Currently at 65% of allocated budget. On track to complete within estimates. No additional resources needed."
+    },
+    {
+        title: "Post-Mortem",
+        content: "Project completed successfully. Key learnings: better communication needed between teams. Documentation to be finalized this week."
+    }
+];
+
 async function initDB() {
     try {
         // clear existing data first 
@@ -314,6 +358,19 @@ async function initDB() {
         }
         console.log('Projects created successfully', projects);
 
+        // creating code repositories for each project
+        const codeRepositories = [];
+        for (let i = 0; i < projects.length; i++) {
+            const project = projects[i];
+            const repoData = {
+                ...dummyCodeRepositories[i],
+                projectId: project._id
+            };
+            const repository = await CodeRepository.create(repoData);
+            codeRepositories.push(repository);
+        }
+        console.log('Code Repositories added successfully', codeRepositories);
+
         // creating kanban boards for each project
         const kanbanBoards = [];
         for (let i = 0; i < projects.length; i++) {
@@ -359,40 +416,46 @@ async function initDB() {
         }
         console.log('Kanban Board Tasks added successfully', kanbanTasks);
 
-        // creating code repositories for each project
-        const codeRepositories = [];
-        for (let i = 0; i < projects.length; i++) {
-            const project = projects[i];
-            const repoData = {
-                ...dummyCodeRepositories[i],
-                projectId: project._id
-            };
-            const repository = await CodeRepository.create(repoData);
-            codeRepositories.push(repository);
-        }
-        console.log('Code Repositories added successfully', codeRepositories);
-
-        // creating comments for kanban tasks
-        const comments = [];
-        for (let i = 0; i < kanbanTasks.length; i++) {
-            // Each task gets 2 comments
-            for (let j = 0; j < 2; j++) {
-                const commentIndex = i * 2 + j;
-                const kanbanTask = kanbanTasks[i];
-                const user = users[i]; // Using the same user for simplicity
-                
-                const commentData = {
-                    ...dummyComments[commentIndex],
-                    userId: user._id,
-                    kanbanBoardTaskId: kanbanTask._id
-                };
-        
-                const comment = await Comment.create(commentData);
-                comments.push(comment);
-            }
-        }
+         // creating comments for kanban tasks
+         const comments = [];
+         for (let i = 0; i < kanbanTasks.length; i++) {
+             // Each task gets 2 comments
+             for (let j = 0; j < 2; j++) {
+                 const commentIndex = i * 2 + j;
+                 const kanbanTask = kanbanTasks[i];
+                 const user = users[i]; // Using the same user for simplicity
+                 
+                 const commentData = {
+                     ...dummyComments[commentIndex],
+                     userId: user._id,
+                     kanbanBoardTaskId: kanbanTask._id
+                 };
+         
+                 const comment = await Comment.create(commentData);
+                 comments.push(comment);
+             }
+         }
         console.log('Comments to kanban board tasks added successfully', comments);
-        
+
+        // creating meeting notes for projects
+        const meetingNotes = [];
+        for (let i = 0; i < projects.length; i++) {
+            // Each project gets 2 meeting notes
+            for (let j = 0; j < 2; j++) {
+                const noteIndex = i * 2 + j;
+                const project = projects[i];
+                
+                const noteData = {
+                    ...dummyMeetingNotes[noteIndex],
+                    projectId: project._id
+                };
+                
+                const meetingNote = await MeetingNote.create(noteData);
+                meetingNotes.push(meetingNote);
+            }
+        };
+        console.log('Meeting Notes added successfully', meetingNotes);
+
     } catch (error) {
         console.error('Error during database initialization:', error);
         throw error;
