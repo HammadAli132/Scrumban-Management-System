@@ -210,6 +210,24 @@ const dummySprints = [
     }
 ];
 
+const dummyCodeRepositories = [
+    {
+        name: "website-redesign"
+    },
+    {
+        name: "mobile-app-dev"
+    },
+    {
+        name: "marketing-campaign"
+    },
+    {
+        name: "internal-tools"
+    },
+    {
+        name: "customer-portal"
+    }
+];
+
 async function initDB() {
     try {
         // clear existing data first 
@@ -306,6 +324,19 @@ async function initDB() {
             kanbanTasks.push(kanbanTask);
         }
         console.log('Kanban Board Tasks added successfully', kanbanTasks);
+
+        // creating code repositories for each project
+        const codeRepositories = [];
+        for (let i = 0; i < projects.length; i++) {
+            const project = projects[i];
+            const repoData = {
+                ...dummyCodeRepositories[i],
+                projectId: project._id
+            };
+            const repository = await CodeRepository.create(repoData);
+            codeRepositories.push(repository);
+        }
+        console.log('Code Repositories added successfully', codeRepositories);
         
     } catch (error) {
         console.error('Error during database initialization:', error);
