@@ -426,7 +426,7 @@ async function initDB() {
             const project = await Project.create(projectData);
             projects.push(project);
         }
-        console.log('Projects created successfully', projects);
+        // console.log('Projects created successfully', projects);
 
         // creating code repositories for each project
         const codeRepositories = [];
@@ -439,7 +439,7 @@ async function initDB() {
             const repository = await CodeRepository.create(repoData);
             codeRepositories.push(repository);
         }
-        console.log('Code Repositories added successfully', codeRepositories);
+        // console.log('Code Repositories added successfully', codeRepositories);
 
         // creating kanban boards for each project
         const kanbanBoards = [];
@@ -452,7 +452,7 @@ async function initDB() {
             const kanbanBoard = await KanbanBoard.create(kanbanBoardData);
             kanbanBoards.push(kanbanBoard);
         }
-        console.log('Kanban Boards created successfully', kanbanBoards);
+        // console.log('Kanban Boards created successfully', kanbanBoards);
 
         // creating sprints for each project
         const sprints = [];
@@ -465,7 +465,7 @@ async function initDB() {
             const sprint = await Sprint.create(sprintData);
             sprints.push(sprint);
         }
-        console.log('Sprints for projects added successfully', sprints);
+        // console.log('Sprints for projects added successfully', sprints);
 
         // creating kanban tasks for each kanban board
         const kanbanTasks = [];
@@ -484,7 +484,7 @@ async function initDB() {
             const kanbanTask = await KanbanBoardTask.create(kanbanTaskData);
             kanbanTasks.push(kanbanTask);
         }
-        console.log('Kanban Board Tasks added successfully', kanbanTasks);
+        // console.log('Kanban Board Tasks added successfully', kanbanTasks);
 
          // creating comments for kanban tasks
          const comments = [];
@@ -505,7 +505,7 @@ async function initDB() {
                  comments.push(comment);
              }
          }
-        console.log('Comments to kanban board tasks added successfully', comments);
+        // console.log('Comments to kanban board tasks added successfully', comments);
 
         // creating meeting notes for projects
         const meetingNotes = [];
@@ -524,7 +524,7 @@ async function initDB() {
                 meetingNotes.push(meetingNote);
             }
         };
-        console.log('Meeting Notes added successfully', meetingNotes);
+        // console.log('Meeting Notes added successfully', meetingNotes);
 
         // creating project collaborators (1 per project)
         const projectCollaborators = [];
@@ -542,7 +542,7 @@ async function initDB() {
             const projectCollaborator = await ProjectCollaborator.create(collaboratorData);
             projectCollaborators.push(projectCollaborator);
         }
-        console.log('Project collaborators added successfully', projectCollaborators);
+        // console.log('Project collaborators added successfully', projectCollaborators);
 
         // creating commits for code repositories
         const commits = [];
@@ -563,7 +563,7 @@ async function initDB() {
                 commits.push(commit);
             }
         }
-        console.log('Commits added successfully', commits);
+        // console.log('Commits added successfully', commits);
     } catch (error) {
         console.error('Error during database initialization:', error);
         throw error;
