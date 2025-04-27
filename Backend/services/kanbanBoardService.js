@@ -125,6 +125,26 @@ const addCommentToKanbanTask = async (taskId, userId, text) => {
     }
 };
 
+const getAllTasksByKanbanId = async (kanbanBoardId) => {
+    try {
+        const kanbanBoard = await KanbanBoard.findById(kanbanBoardId);
+
+        if (!kanbanBoard) {
+            throw new Error("Kanban Board not found");
+        }
+
+        // Get all tasks with populated user and sprint data
+        const tasks = await KanbanBoardTask.find({ kanbanBoardId })
+            .populate('userId', 'username')
+            .populate('sprintId', 'title startDate endDate')
+            .sort({ createdAt: -1 }); // Newest first
+
+        return tasks;
+    } catch (error) {
+        throw new Error("Error fetching tasks: " + error.message);
+    }
+};
+
 module.exports = {
     getKanbanBoardByProjectId,
     updateKanbanBoardTitleById,
@@ -132,5 +152,6 @@ module.exports = {
     createKanbanBoardTaskByProjectId,
     getKanbanBoardIdByProjectId,
     deleteKanbanBoardTaskById,
-    addCommentToKanbanTask
+    addCommentToKanbanTask,
+    getAllTasksByKanbanId
 };
