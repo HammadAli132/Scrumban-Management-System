@@ -62,7 +62,7 @@ function ProjectDetails() {
   return (
     <div className="px-4 py-6 md:px-6 lg:px-8">
       <div className="mb-6">
-        <Link to="/" className="inline-flex items-center text-blue-500 hover:text-blue-400 mb-4">
+        <Link to="/dashboard" className="inline-flex items-center text-blue-500 hover:text-blue-400 mb-4">
           <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
         </Link>
         <h1 className="text-2xl font-bold text-white">{project.name}</h1>
