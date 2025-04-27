@@ -145,7 +145,7 @@ const getAllTasksByKanbanId = async (kanbanBoardId) => {
     }
 };
 
-const updateKanbanTaskSwimLane = async (taskId, swimLaneStatus) => {
+const updateKanbanTaskSwimLaneByTaskId = async (taskId, swimLaneStatus) => {
     try {
         const updatedTask = await KanbanBoardTask.findOneAndUpdate(
             { _id: taskId },
@@ -172,5 +172,5 @@ module.exports = {
     deleteKanbanBoardTaskById,
     addCommentToKanbanTaskByTaskId,
     getAllTasksByKanbanId,
-    updateKanbanTaskSwimLane
+    updateKanbanTaskSwimLaneByTaskId
 };
