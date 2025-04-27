@@ -1,37 +1,37 @@
 const mongoose = require("mongoose");
-const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById, updateKanbanBoardTaskById, getKanbanBoardIdByProjectId, deleteKanbanBoardTaskById, addCommentToKanbanTaskByTaskId, getAllTasksByKanbanId } = require("../services/kanbanBoardService");
+const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById, updateKanbanBoardTaskById, getKanbanBoardIdByProjectId, deleteKanbanBoardTaskById, addCommentToKanbanTaskByTaskId, getAllTasksByKanbanId, updateKanbanTaskSwimLaneByTaskId } = require("../services/kanbanBoardService");
 
 const createKanbanBoardTask = async (req, res) => {
     try {
-        const {projectId} = req.params;
+        const { projectId } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(projectId)) {
             return res.status(404).json({ success: false, message: "Project not found!" });
-        } 
+        }
 
-        const { 
-            title, 
-            description, 
-            priorityLevel, 
-            dueDate, 
-            swimLane, 
-            sprintId, 
-            userId 
+        const {
+            title,
+            description,
+            priorityLevel,
+            dueDate,
+            swimLane,
+            sprintId,
+            userId
         } = req.body;
 
         const taskData = {
-            ...(title != undefined && {title}),
-            ...(description != undefined && {description}),
-            ...(priorityLevel != undefined && {priorityLevel}),
-            ...(dueDate != undefined && {dueDate}),
-            ...(swimLane != undefined && {swimLane}),
-            ...(sprintId != undefined && {sprintId}),
-            ...(userId != undefined && {userId})
+            ...(title != undefined && { title }),
+            ...(description != undefined && { description }),
+            ...(priorityLevel != undefined && { priorityLevel }),
+            ...(dueDate != undefined && { dueDate }),
+            ...(swimLane != undefined && { swimLane }),
+            ...(sprintId != undefined && { sprintId }),
+            ...(userId != undefined && { userId })
         };
 
         const newKanbanBoardTask = await createKanbanBoardTaskByProjectId(projectId, taskData);
 
-        res.status(200).json({success: true, data: newKanbanBoardTask});
+        res.status(200).json({ success: true, data: newKanbanBoardTask });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -39,15 +39,15 @@ const createKanbanBoardTask = async (req, res) => {
 
 const getKanbanBoard = async (req, res) => {
     try {
-        const {projectId} = req.params;
+        const { projectId } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(projectId)) {
             return res.status(404).json({ success: false, message: "Project not found!" });
-        } 
+        }
 
         const kanbanBoardTasks = await getKanbanBoardByProjectId(projectId);
 
-        res.status(200).json({success: true, data: kanbanBoardTasks});
+        res.status(200).json({ success: true, data: kanbanBoardTasks });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -55,20 +55,20 @@ const getKanbanBoard = async (req, res) => {
 
 const updateKanbanBoardTitle = async (req, res) => {
     try {
-        const {kanbanBoardId} = req.params;
-        const {title} = req.body;
+        const { kanbanBoardId } = req.params;
+        const { title } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(kanbanBoardId)) {
             return res.status(404).json({ success: false, message: "Kanban Board not found!" });
         }
 
         if (!title) {
-            return res.status(400).json({success: false, message: "Title is required to update this field."});
+            return res.status(400).json({ success: false, message: "Title is required to update this field." });
         }
 
         const updatedBoard = await updateKanbanBoardTitleById(kanbanBoardId);
 
-        res.status(200).json({success: true, data: updatedBoard});
+        res.status(200).json({ success: true, data: updatedBoard });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -76,35 +76,35 @@ const updateKanbanBoardTitle = async (req, res) => {
 
 const updateKanbanBoardTask = async (req, res) => {
     try {
-        const {taskId} = req.params;
+        const { taskId } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(taskId)) {
             return res.status(404).json({ success: false, message: "Task not found!" });
         }
 
-        const { 
-            title, 
-            description, 
-            priorityLevel, 
-            dueDate, 
-            swimLane, 
-            sprintId, 
-            userId 
+        const {
+            title,
+            description,
+            priorityLevel,
+            dueDate,
+            swimLane,
+            sprintId,
+            userId
         } = req.body;
 
         const updateData = {
-            ...(title != undefined && {title}),
-            ...(description != undefined && {description}),
-            ...(priorityLevel != undefined && {priorityLevel}),
-            ...(dueDate != undefined && {dueDate}),
-            ...(swimLane != undefined && {swimLane}),
-            ...(sprintId != undefined && {sprintId}),
-            ...(userId != undefined && {userId})
+            ...(title != undefined && { title }),
+            ...(description != undefined && { description }),
+            ...(priorityLevel != undefined && { priorityLevel }),
+            ...(dueDate != undefined && { dueDate }),
+            ...(swimLane != undefined && { swimLane }),
+            ...(sprintId != undefined && { sprintId }),
+            ...(userId != undefined && { userId })
         };
 
         const updatedTask = await updateKanbanBoardTaskById(taskId, updateData);
-        
-        res.status(200).json({success: true, data: updatedTask});
+
+        res.status(200).json({ success: true, data: updatedTask });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -120,9 +120,9 @@ const getKanbanBoardId = async (req, res) => {
 
         const kanbanBoardId = await getKanbanBoardIdByProjectId(projectId);
 
-        res.status(200).json({success: true, data: { kanbanBoardId }});
+        res.status(200).json({ success: true, data: { kanbanBoardId } });
     } catch (error) {
-        res.status(500).json({success: false, error: error.message});
+        res.status(500).json({ success: false, error: error.message });
     }
 };
 
@@ -135,15 +135,15 @@ const deleteKanbanBoardTask = async (req, res) => {
         }
 
         const deletedTask = await deleteKanbanBoardTaskById(taskId);
-        
-        res.status(200).json({ 
-            success: true, 
+
+        res.status(200).json({
+            success: true,
             message: "Task deleted successfully",
-            data: deletedTask 
+            data: deletedTask
         });
 
     } catch (error) {
-        res.status(500).json({success: false, error: error.message});
+        res.status(500).json({ success: false, error: error.message });
     }
 };
 
@@ -157,21 +157,21 @@ const addCommentToKanbanTask = async (req, res) => {
         }
 
         if (!text || text.trim() === "") {
-            return res.status(400).json({ 
-                success: false, 
-                message: "Comment text is required" 
+            return res.status(400).json({
+                success: false,
+                message: "Comment text is required"
             });
         }
 
         const newComment = await addCommentToKanbanTaskByTaskId(taskId, userId, text);
-        
-        res.status(201).json({ 
-            success: true, 
+
+        res.status(201).json({
+            success: true,
             message: "Comment added successfully",
-            data: newComment 
+            data: newComment
         });
     } catch (error) {
-        res.status(500).json({success: false, error: error.message});
+        res.status(500).json({ success: false, error: error.message });
     }
 };
 
@@ -184,13 +184,40 @@ const getTasksOfKanbanBoard = async (req, res) => {
         }
 
         const tasks = await getAllTasksByKanbanId(kanbanBoardId);
-        
-        res.status(200).json({ 
+
+        res.status(200).json({
             success: true,
-            data: tasks 
+            data: tasks
         });
     } catch (error) {
-        res.status(500).json({success: false, error: error.message});
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+const updateTaskSwimLane = async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        const { swimLane } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(taskId)) {
+            return res.status(404).json({ success: false, message: "Kanban board task not found!" });
+        }
+
+        if (!swimLane) {
+            return res.status(400).json({success: false, message: "Swim lane status is required"});
+        }
+
+        // Update the task swim lane
+        const result = await updateKanbanTaskSwimLaneByTaskId(taskId, swimLane);
+        
+        res.status(200).json({
+            success: true,
+            message: "Task swim lane updated successfully",
+            data: result
+        });
+        
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
 }
 
@@ -202,5 +229,6 @@ module.exports = {
     getKanbanBoardId,
     deleteKanbanBoardTask,
     addCommentToKanbanTask,
-    getTasksOfKanbanBoard
+    getTasksOfKanbanBoard,
+    updateTaskSwimLane
 };
