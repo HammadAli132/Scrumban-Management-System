@@ -1,6 +1,11 @@
 const User = require("../models/user.js");
 const ToDoList = require("../models/toDoList.js");
 const ToDoListTask = require("../models/toDoListTask.js");
+const Project = require("../models/project.js");
+const KanbanBoard = require("../models/kanbanBoard.js");
+const KanbanBoardTask = require("../models/kanbanBoardTask.js");
+const Sprint = require("../models/sprint.js");
+const CodeRepository = require("../models/codeRepository.js");
 
 const dummyUsers = [
     {
