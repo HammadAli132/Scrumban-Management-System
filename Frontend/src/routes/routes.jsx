@@ -8,6 +8,7 @@ import Login from "../pages/Login.jsx";
 import Projects from "../pages/Projects.jsx";
 import ToDo from "../pages/ToDo.jsx";
 import Repository from "../pages/Repository.jsx";
+import DashboardLayout from "../components/dashboard_layout/DashboardLayout.jsx";
 
 const routes = [
     {
@@ -16,7 +17,9 @@ const routes = [
         children: [
             {
                 index: true,
-                element: <Dashboard />,
+                element: <DashboardLayout>
+                    <Dashboard />
+                    </DashboardLayout> ,
             },
             {
                 path: "/login",
@@ -43,15 +46,21 @@ const routes = [
 
             {
                 path: "/project/:projectid",
-                element: <Projects />,
+                element: <DashboardLayout>
+                    <Projects />
+                </DashboardLayout>,
             },
             {
                 path: "/project/:projectid/kanban/:kanbanid",
-                element: <KanbanBoard />,
+                element: <DashboardLayout>
+                    <KanbanBoard />
+                </DashboardLayout>,
             },
             {
                 path: "/project/:projectid/repository/:repositoryid",
-                element: <Repository />,
+                element: <DashboardLayout>
+                    <Repository />
+                </DashboardLayout>,
             }
         ],
     },

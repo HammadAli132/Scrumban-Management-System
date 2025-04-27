@@ -1,4 +1,4 @@
-import ProjectCard from "../components/project/ProjectCard"
+import ProjectCard from "../components/dashboard/ProjectCard"
 
 const dummyProjects = [
     { id: 1, name: "Project 1", description: "Description of Project 1" },
