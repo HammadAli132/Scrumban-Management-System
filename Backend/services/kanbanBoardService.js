@@ -145,6 +145,24 @@ const getAllTasksByKanbanId = async (kanbanBoardId) => {
     }
 };
 
+const updateKanbanTaskSwimLane = async (taskId, swimLaneStatus) => {
+    try {
+        const updatedTask = await KanbanBoardTask.findOneAndUpdate(
+            { _id: taskId },
+            { swimLane: swimLaneStatus },
+            { new: true }
+        );
+
+        if (!updatedTask) {
+            throw new Error("Kanban Board Task not found");
+        }
+
+        return updatedTask;
+    } catch (error) {
+        throw new Error("Error fetching tasks: " + error.message);
+    }
+}
+
 module.exports = {
     getKanbanBoardByProjectId,
     updateKanbanBoardTitleById,
@@ -153,5 +171,6 @@ module.exports = {
     getKanbanBoardIdByProjectId,
     deleteKanbanBoardTaskById,
     addCommentToKanbanTaskByTaskId,
-    getAllTasksByKanbanId
+    getAllTasksByKanbanId,
+    updateKanbanTaskSwimLane
 };

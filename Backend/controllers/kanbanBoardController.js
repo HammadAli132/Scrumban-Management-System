@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById, updateKanbanBoardTaskById, getKanbanBoardIdByProjectId, deleteKanbanBoardTaskById, addCommentToKanbanTaskByTaskId } = require("../services/kanbanBoardService");
+const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById, updateKanbanBoardTaskById, getKanbanBoardIdByProjectId, deleteKanbanBoardTaskById, addCommentToKanbanTaskByTaskId, getAllTasksByKanbanId } = require("../services/kanbanBoardService");
 
 const createKanbanBoardTask = async (req, res) => {
     try {
@@ -173,6 +173,25 @@ const addCommentToKanbanTask = async (req, res) => {
     } catch (error) {
         res.status(500).json({success: false, error: error.message});
     }
+};
+
+const getTasksOfKanbanBoard = async (req, res) => {
+    try {
+        const { kanbanBoardId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(kanbanBoardId)) {
+            return res.status(404).json({ success: false, message: "Kanban board not found!" });
+        }
+
+        const tasks = await getAllTasksByKanbanId(kanbanBoardId);
+        
+        res.status(200).json({ 
+            success: true,
+            data: tasks 
+        });
+    } catch (error) {
+        res.status(500).json({success: false, error: error.message});
+    }
 }
 
 module.exports = {
@@ -182,5 +201,6 @@ module.exports = {
     updateKanbanBoardTask,
     getKanbanBoardId,
     deleteKanbanBoardTask,
-    addCommentToKanbanTask
+    addCommentToKanbanTask,
+    getTasksOfKanbanBoard
 };
