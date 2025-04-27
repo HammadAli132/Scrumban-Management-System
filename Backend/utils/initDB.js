@@ -8,6 +8,7 @@ const Sprint = require("../models/sprint.js");
 const CodeRepository = require("../models/codeRepository.js");
 const Comment = require("../models/comment.js");
 const MeetingNote = require('../models/meetingNote.js');
+const ProjectCollaborator = require("../models/projectCollaborator.js");
 
 const dummyUsers = [
     {
@@ -316,6 +317,10 @@ async function initDB() {
         await KanbanBoardTask.deleteMany({});
         await Sprint.deleteMany({});
         await Project.deleteMany({});
+        await CodeRepository.deleteMany({});
+        await Comment.deleteMany({});
+        await MeetingNote.deleteMany({});
+        await ProjectCollaborator.deleteMany({});
 
         // creating dummy users
         const users = await User.insertMany(dummyUsers);
@@ -455,6 +460,25 @@ async function initDB() {
             }
         };
         console.log('Meeting Notes added successfully', meetingNotes);
+
+        // creating project collaborators (1 per project)
+        const projectCollaborators = [];
+        for (let i = 0; i < projects.length; i++) {
+            const project = projects[i];
+            // Get a different user than the project creator to be the collaborator
+            const collaboratorIndex = (i + 1) % users.length;
+            const collaborator = users[collaboratorIndex];
+            
+            const collaboratorData = {
+                userId: collaborator._id,
+                projectId: project._id
+            };
+            
+            const projectCollaborator = await ProjectCollaborator.create(collaboratorData);
+            projectCollaborators.push(projectCollaborator);
+        }
+        console.log('Project collaborators added successfully', projectCollaborators);
+        
 
     } catch (error) {
         console.error('Error during database initialization:', error);
