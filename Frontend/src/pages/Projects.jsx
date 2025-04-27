@@ -40,8 +40,8 @@ const dummyProjects = [
 ];
 
 function ProjectDetails() {
-  const { id } = useParams();
-  const projectId = parseInt(id || '1', 10);
+  const { projectid } = useParams();
+  const projectId = parseInt(projectid || '1', 10);
   
   // Find the project from our dummy data
   const project = dummyProjects.find(p => p.id === projectId);
