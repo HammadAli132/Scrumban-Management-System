@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById, updateKanbanBoardTaskById, getKanbanBoardIdByProjectId } = require("../services/kanbanBoardService");
+const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById, updateKanbanBoardTaskById, getKanbanBoardIdByProjectId, deleteKanbanBoardTaskById } = require("../services/kanbanBoardService");
 
 const createKanbanBoardTask = async (req, res) => {
     try {
@@ -126,10 +126,32 @@ const getKanbanBoardId = async (req, res) => {
     }
 };
 
+const deleteKanbanBoardTask = async (req, res) => {
+    try {
+        const { taskId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(taskId)) {
+            return res.status(404).json({ success: false, message: "Kanban task not found!" });
+        }
+
+        const deletedTask = await deleteKanbanBoardTaskById(taskId);
+        
+        res.status(200).json({ 
+            success: true, 
+            message: "Task deleted successfully",
+            data: deletedTask 
+        });
+
+    } catch (error) {
+        res.status(500).json({success: false, error: error.message});
+    }
+};
+
 module.exports = {
     createKanbanBoardTask,
     getKanbanBoard,
     updateKanbanBoardTitle,
     updateKanbanBoardTask,
-    getKanbanBoardId
+    getKanbanBoardId,
+    deleteKanbanBoardTask
 };
