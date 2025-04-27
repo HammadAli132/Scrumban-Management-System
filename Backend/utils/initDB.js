@@ -149,14 +149,14 @@ const dummyKanbanTasks = [
         description: "Create wireframes for the new homepage",
         priorityLevel: "high",
         dueDate: "2023-11-07",
-        swimLane: "Do"
+        swimLane: "ToDo"
     },
     {
         title: "Implement user authentication",
         description: "Set up JWT authentication for the API",
         priorityLevel: "high",
         dueDate: "2023-11-12",
-        swimLane: "Do"
+        swimLane: "ToDo"
     },
     {
         title: "Create social media content",

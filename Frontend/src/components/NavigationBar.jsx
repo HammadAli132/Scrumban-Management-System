@@ -50,7 +50,7 @@ export default function NavigationBar() {
 
                 {/* Dashboard Icon */}
                 <Link
-                    to="/"
+                    to="/dashboard"
                     className="cursor-pointer hover:bg-[#2f2f2f] rounded-lg p-1 flex items-center justify-center"
                     onClick={() => setActiveIcon(0)}
                 >

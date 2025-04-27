@@ -10,6 +10,7 @@ import ToDo from "../pages/ToDo.jsx";
 import Repository from "../pages/Repository.jsx";
 import DashboardLayout from "../components/dashboard_layout/DashboardLayout.jsx";
 import FileView from "../pages/FileView.jsx";
+import SignupPage from "../pages/Signup.jsx";
 
 const routes = [
     {
@@ -18,17 +19,23 @@ const routes = [
         children: [
             {
                 index: true,
+                element: <Login />,
+            },
+            {
+                path: "/dashboard",
                 element: <DashboardLayout>
                     <Dashboard />
                     </DashboardLayout> ,
             },
             {
-                path: "/login",
-                element: <Login />,
+                path: "/signup",
+                element: <SignupPage />,
             },
             {
                 path: "/to-do-list",
-                element: <ToDo />,
+                element: <DashboardLayout>
+                    <ToDo />
+                    </DashboardLayout>,
                 children: [
                     {
                         index: true,

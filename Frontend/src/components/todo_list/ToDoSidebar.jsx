@@ -28,7 +28,7 @@ const ToDoSidebar = () => {
   const { todos } = useToDoContext(); // Assuming you have a context for managing todos
 
   return (
-    <nav className="lg:w-64 lg:flex-shrink-0 lg:h-screen lg:sticky lg:top-0 lg:left-0 fixed bottom-0 right-0 z-10" >
+    <nav className="lg:w-64 fixed lg:flex-shrink-0 lg:h-screen lg:sticky lg:top-0 lg:left-0 bottom-0 right-0 z-10" >
       <div className="h-full p-3 flex lg:flex-col flex-row lg:gap-6 gap-4 overflow-x-auto lg:overflow-y-auto border-r border-[#282828]">
         {/* Main Navigation */}
         <ul className="space-y-1 lg:w-full flex lg:flex-col flex-row lg:gap-0 gap-4">
@@ -41,7 +41,7 @@ const ToDoSidebar = () => {
         <div className="w-full h-px bg-[#282828]" />
 
         {/* Bottom Items */}
-        <ul className="lg:mt-auto space-y-1 lg:w-full flex lg:flex-col flex-row lg:gap-0 gap-4">
+        <ul className="space-y-1 lg:w-full flex lg:flex-col flex-row lg:gap-0 gap-4">
           <NavItem icon={<CheckSquare size={20} color="#a7a7a7" />} label="Completed" link={"/to-do-list/completed"} />
           <NavItem icon={<Trash2 size={20} color="#a7a7a7" />} label="Trash" link={"/to-do-list/deleted"} />
           <NavItem icon={<HelpCircle size={20} color="#a7a7a7" />} label="Help" />
