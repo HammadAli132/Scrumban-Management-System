@@ -9,6 +9,7 @@ const CodeRepository = require("../models/codeRepository.js");
 const Comment = require("../models/comment.js");
 const MeetingNote = require('../models/meetingNote.js');
 const ProjectCollaborator = require("../models/projectCollaborator.js");
+const Commit = require('../models/commit.js');
 
 const dummyUsers = [
     {
@@ -307,6 +308,69 @@ const dummyMeetingNotes = [
     }
 ];
 
+const dummyCommits = [
+    {
+        message: "Initial project setup",
+        hash: "a1b2c3d4e5f6g7h8i9j0",
+        file: "package.json",
+        status: "approved"
+    },
+    {
+        message: "Add user authentication",
+        hash: "b2c3d4e5f6g7h8i9j0k1",
+        file: "authController.js",
+        status: "approved"
+    },
+    {
+        message: "Fix login bug",
+        hash: "c3d4e5f6g7h8i9j0k1l2",
+        file: "authService.js",
+        status: "pending"
+    },
+    {
+        message: "Update homepage design",
+        hash: "d4e5f6g7h8i9j0k1l2m3",
+        file: "HomePage.jsx",
+        status: "approved"
+    },
+    {
+        message: "Refactor API endpoints",
+        hash: "e5f6g7h8i9j0k1l2m3n4",
+        file: "routes/api.js",
+        status: "pending"
+    },
+    {
+        message: "Add database migration",
+        hash: "f6g7h8i9j0k1l2m3n4o5",
+        file: "migrations/001-initial.js",
+        status: "approved"
+    },
+    {
+        message: "Implement search functionality",
+        hash: "g7h8i9j0k1l2m3n4o5p6",
+        file: "searchService.js",
+        status: "pending"
+    },
+    {
+        message: "Update documentation",
+        hash: "h8i9j0k1l2m3n4o5p6q7",
+        file: "README.md",
+        status: "approved"
+    },
+    {
+        message: "Fix responsive layout issues",
+        hash: "i9j0k1l2m3n4o5p6q7r8",
+        file: "styles.css",
+        status: "approved"
+    },
+    {
+        message: "Add unit tests",
+        hash: "j0k1l2m3n4o5p6q7r8s9",
+        file: "tests/user.test.js",
+        status: "pending"
+    }
+];
+
 async function initDB() {
     try {
         // clear existing data first 
@@ -478,8 +542,27 @@ async function initDB() {
             projectCollaborators.push(projectCollaborator);
         }
         console.log('Project collaborators added successfully', projectCollaborators);
-        
 
+        // creating commits for code repositories
+        const commits = [];
+        for (let i = 0; i < codeRepositories.length; i++) {
+            // Each repository gets 2 commits
+            for (let j = 0; j < 2; j++) {
+                const commitIndex = i * 2 + j;
+                const repository = codeRepositories[i];
+                const user = users[i]; // Using the same user for simplicity
+                
+                const commitData = {
+                    ...dummyCommits[commitIndex],
+                    userId: user._id,
+                    repositoryId: repository._id
+                };
+        
+                const commit = await Commit.create(commitData);
+                commits.push(commit);
+            }
+        }
+        console.log('Commits added successfully', commits);
     } catch (error) {
         console.error('Error during database initialization:', error);
         throw error;
