@@ -1,5 +1,13 @@
 const mongoose = require("mongoose");
-const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById, updateKanbanBoardTaskById, getKanbanBoardIdByProjectId, deleteKanbanBoardTaskById, addCommentToKanbanTaskByTaskId, getAllTasksByKanbanId, updateKanbanTaskSwimLaneByTaskId } = require("../services/kanbanBoardService");
+const { createKanbanBoardTaskByProjectId,
+        getKanbanBoardByProjectId,
+        updateKanbanBoardTitleById,
+        updateKanbanBoardTaskById,
+        getKanbanBoardIdByProjectId,
+        deleteKanbanBoardTaskById,
+        addCommentToKanbanTaskByTaskId,
+        getAllTasksByKanbanId,
+        updateKanbanTaskSwimLaneByTaskId } = require("../services/kanbanBoardService");
 
 const createKanbanBoardTask = async (req, res) => {
     try {
