@@ -20,6 +20,7 @@ const kanbanBoardTaskSchema = new mongoose.Schema({
     },
     swimLane: {
         type: String,
+        enum: ['Do', 'Doing', 'Done'],
         required: true
     },
     sprintId: {

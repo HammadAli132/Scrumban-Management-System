@@ -40,7 +40,7 @@ const dummyUsers = [
     }
 ]
 
-const dummyTasks = [
+const dummyToDoTasks = [
     {
         title: "Complete project proposal",
         description: "Finish writing the project proposal document and submit it",
@@ -83,12 +83,138 @@ const dummyTasks = [
     }
 ];
 
+const dummyProjects = [
+    {
+        title: "Website Redesign",
+        description: "Complete overhaul of company website with modern design",
+        startDate: "2023-11-01",
+        endDate: "2023-12-15"
+    },
+    {
+        title: "Mobile App Development",
+        description: "Build cross-platform mobile application for iOS and Android",
+        startDate: "2023-11-10",
+        endDate: "2024-02-28"
+    },
+    {
+        title: "Marketing Campaign",
+        description: "Q4 promotional campaign for new product line",
+        startDate: "2023-11-15",
+        endDate: "2023-12-31"
+    },
+    {
+        title: "Internal Tool Upgrade",
+        description: "Update legacy systems to modern technologies",
+        startDate: "2023-12-01",
+        endDate: "2024-03-30"
+    },
+    {
+        title: "Customer Portal",
+        description: "Develop self-service portal for customers",
+        startDate: "2024-01-01",
+        endDate: "2024-04-30"
+    }
+];
+
+const dummyKanbanBoards = [
+    {
+        title: "Website Redesign Tasks"
+    },
+    {
+        title: "Mobile App Tasks"
+    },
+    {
+        title: "Marketing Tasks"
+    },
+    {
+        title: "Internal Tools Tasks"
+    },
+    {
+        title: "Customer Portal Tasks"
+    }
+];
+
+const dummyKanbanTasks = [
+    {
+        title: "Design homepage layout",
+        description: "Create wireframes for the new homepage",
+        priorityLevel: "high",
+        dueDate: "2023-11-07",
+        swimLane: "Do"
+    },
+    {
+        title: "Implement user authentication",
+        description: "Set up JWT authentication for the API",
+        priorityLevel: "high",
+        dueDate: "2023-11-12",
+        swimLane: "Do"
+    },
+    {
+        title: "Create social media content",
+        description: "Design graphics for campaign launch",
+        priorityLevel: "medium",
+        dueDate: "2023-11-18",
+        swimLane: "Doing"
+    },
+    {
+        title: "Migrate database",
+        description: "Move legacy data to new schema",
+        priorityLevel: "medium",
+        dueDate: "2023-12-05",
+        swimLane: "Done"
+    },
+    {
+        title: "Setup CI/CD pipeline",
+        description: "Configure automated deployment",
+        priorityLevel: "low",
+        dueDate: "2024-01-10",
+        swimLane: "Doing"
+    }
+];
+
+const dummySprints = [
+    {
+        title: "Sprint 1 - Foundation",
+        startDate: "2023-11-01",
+        endDate: "2023-11-14",
+        retrospective: "Initial setup went well, need more design assets"
+    },
+    {
+        title: "Sprint 2 - Core Features",
+        startDate: "2023-11-15",
+        endDate: "2023-11-28",
+        retrospective: "Backend completed ahead of schedule"
+    },
+    {
+        title: "Sprint 3 - UI Polish",
+        startDate: "2023-11-29",
+        endDate: "2023-12-12",
+        retrospective: "Need more testing resources"
+    },
+    {
+        title: "Sprint 4 - Final Touches",
+        startDate: "2023-12-13",
+        endDate: "2023-12-26",
+        retrospective: "Ready for launch"
+    },
+    {
+        title: "Sprint 1 - Planning",
+        startDate: "2024-01-01",
+        endDate: "2024-01-14",
+        retrospective: "Requirements finalized"
+    }
+];
+
 async function initDB() {
     try {
         // clear existing data first 
         await User.deleteMany({});
-        await ToDoList.deleteMany({});
         await ToDoListTask.deleteMany({});
+        await ToDoList.deleteMany({});
+        await KanbanBoard.deleteMany({});
+        await KanbanBoardTask.deleteMany({});
+        await Sprint.deleteMany({});
+        await Project.deleteMany({});
 
         // creating dummy users
         const users = await User.insertMany(dummyUsers);
@@ -109,7 +235,7 @@ async function initDB() {
             
             // Create a task for each todo list
             const taskData = {
-                ...dummyTasks[i],
+                ...dummyToDoTasks[i],
                 toDoListId: todoList._id
             };
             
@@ -117,6 +243,65 @@ async function initDB() {
             tasks.push(task);
         }
         // console.log('Tasks created successfully', tasks);
+
+        // creating projects for each user
+        const projects = [];
+        for (let i = 0; i < users.length; i++) {
+            const user = users[i];
+            const projectData = {
+                ...dummyProjects[i],
+                userId: user._id
+            };
+            const project = await Project.create(projectData);
+            projects.push(project);
+        }
+        console.log('Projects created successfully', projects);
+
+        // creating kanban boards for each project
+        const kanbanBoards = [];
+        for (let i = 0; i < projects.length; i++) {
+            const project = projects[i];
+            const kanbanBoardData = {
+                ...dummyKanbanBoards[i],
+                projectId: project._id
+            };
+            const kanbanBoard = await KanbanBoard.create(kanbanBoardData);
+            kanbanBoards.push(kanbanBoard);
+        }
+        console.log('Kanban Boards created successfully', kanbanBoards);
+
+        // creating sprints for each project
+        const sprints = [];
+        for (let i = 0; i < projects.length; i++) {
+            const project = projects[i];
+            const sprintData = {
+                ...dummySprints[i],
+                projectId: project._id
+            };
+            const sprint = await Sprint.create(sprintData);
+            sprints.push(sprint);
+        }
+        console.log('Sprints for projects added successfully', sprints);
+
+        // creating kanban tasks for each kanban board
+        const kanbanTasks = [];
+        for (let i = 0; i < kanbanBoards.length; i++) {
+            const kanbanBoard = kanbanBoards[i];
+            const user = users[i];
+            const sprint = sprints[i];
+            
+            const kanbanTaskData = {
+                ...dummyKanbanTasks[i],
+                kanbanBoardId: kanbanBoard._id,
+                userId: user._id,
+                sprintId: sprint._id
+            };
+            
+            const kanbanTask = await KanbanBoardTask.create(kanbanTaskData);
+            kanbanTasks.push(kanbanTask);
+        }
+        console.log('Kanban Board Tasks added successfully', kanbanTasks);
+        
     } catch (error) {
         console.error('Error during database initialization:', error);
         throw error;
