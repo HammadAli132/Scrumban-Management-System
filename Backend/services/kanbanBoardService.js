@@ -89,10 +89,25 @@ const getKanbanBoardIdByProjectId = async (projectId) => {
     }
 }
 
+const deleteKanbanBoardTaskById = async (taskId) => {
+    try {
+        const deletedTask = await KanbanBoardTask.findOneAndDelete({ _id: taskId });
+
+        if (!deletedTask) {
+            throw new Error("Kanban Board Task not found");
+        }
+
+        return deletedTask;
+    } catch (error) {
+        throw new Error("Error deleting kanban board task: " + error.message);
+    }
+};
+
 module.exports = {
     getKanbanBoardByProjectId,
     updateKanbanBoardTitleById,
     updateKanbanBoardTaskById,
     createKanbanBoardTaskByProjectId,
-    getKanbanBoardIdByProjectId
+    getKanbanBoardIdByProjectId,
+    deleteKanbanBoardTaskById
 };
