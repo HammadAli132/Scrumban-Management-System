@@ -6,6 +6,7 @@ const KanbanBoard = require("../models/kanbanBoard.js");
 const KanbanBoardTask = require("../models/kanbanBoardTask.js");
 const Sprint = require("../models/sprint.js");
 const CodeRepository = require("../models/codeRepository.js");
+const Comment = require("../models/comment.js")
 
 const dummyUsers = [
     {
@@ -228,6 +229,39 @@ const dummyCodeRepositories = [
     }
 ];
 
+const dummyComments = [
+    {
+        text: "This task is blocked until we get the design assets from the team."
+    },
+    {
+        text: "I've completed the backend part, frontend integration needed."
+    },
+    {
+        text: "Need clarification on the color scheme for this component."
+    },
+    {
+        text: "This is ready for QA testing."
+    },
+    {
+        text: "Deployment completed successfully to staging environment."
+    },
+    {
+        text: "Found a small bug in the authentication flow, working on fix."
+    },
+    {
+        text: "Approved and merged to main branch."
+    },
+    {
+        text: "Need more details about the API requirements."
+    },
+    {
+        text: "This is now unblocked and ready for development."
+    },
+    {
+        text: "Client requested some changes, see email for details."
+    }
+];
+
 async function initDB() {
     try {
         // clear existing data first 
@@ -337,6 +371,27 @@ async function initDB() {
             codeRepositories.push(repository);
         }
         console.log('Code Repositories added successfully', codeRepositories);
+
+        // creating comments for kanban tasks
+        const comments = [];
+        for (let i = 0; i < kanbanTasks.length; i++) {
+            // Each task gets 2 comments
+            for (let j = 0; j < 2; j++) {
+                const commentIndex = i * 2 + j;
+                const kanbanTask = kanbanTasks[i];
+                const user = users[i]; // Using the same user for simplicity
+                
+                const commentData = {
+                    ...dummyComments[commentIndex],
+                    userId: user._id,
+                    kanbanBoardTaskId: kanbanTask._id
+                };
+        
+                const comment = await Comment.create(commentData);
+                comments.push(comment);
+            }
+        }
+        console.log('Comments to kanban board tasks added successfully', comments);
         
     } catch (error) {
         console.error('Error during database initialization:', error);
