@@ -75,9 +75,24 @@ const createKanbanBoardTaskByProjectId = async (projectId, taskData) => {
     }
 };
 
+const getKanbanBoardIdByProjectId = async (projectId) => {
+    try {
+        const kanbanBoard = await KanbanBoard.findOne({ projectId: projectId });
+        
+        if (!kanbanBoard) {
+            throw new Error("Kanban Board not found for this project");
+        }
+
+        return kanbanBoard._id;
+    } catch (error) {
+        throw new Error("Error getting kanban board ID: " + error.message);
+    }
+}
+
 module.exports = {
     getKanbanBoardByProjectId,
     updateKanbanBoardTitleById,
     updateKanbanBoardTaskById,
-    createKanbanBoardTaskByProjectId
+    createKanbanBoardTaskByProjectId,
+    getKanbanBoardIdByProjectId
 };
