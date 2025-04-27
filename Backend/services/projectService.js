@@ -1,4 +1,5 @@
 const Project = require('../models/project');
+const ProjectCollaborator = require('../models/projectCollaborator');
 
 const getProjectDetailsByProjectId = async (projectId) => {
     try {
