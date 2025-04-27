@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById, updateKanbanBoardTaskById, getKanbanBoardIdByProjectId, deleteKanbanBoardTaskById } = require("../services/kanbanBoardService");
+const { createKanbanBoardTaskByProjectId, getKanbanBoardByProjectId, updateKanbanBoardTitleById, updateKanbanBoardTaskById, getKanbanBoardIdByProjectId, deleteKanbanBoardTaskById, addCommentToKanbanTaskByTaskId } = require("../services/kanbanBoardService");
 
 const createKanbanBoardTask = async (req, res) => {
     try {
@@ -147,11 +147,40 @@ const deleteKanbanBoardTask = async (req, res) => {
     }
 };
 
+const addCommentToKanbanTask = async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        const { text, userId } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(taskId)) {
+            return res.status(404).json({ success: false, message: "Kanban task not found!" });
+        }
+
+        if (!text || text.trim() === "") {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Comment text is required" 
+            });
+        }
+
+        const newComment = await addCommentToKanbanTaskByTaskId(taskId, userId, text);
+        
+        res.status(201).json({ 
+            success: true, 
+            message: "Comment added successfully",
+            data: newComment 
+        });
+    } catch (error) {
+        res.status(500).json({success: false, error: error.message});
+    }
+}
+
 module.exports = {
     createKanbanBoardTask,
     getKanbanBoard,
     updateKanbanBoardTitle,
     updateKanbanBoardTask,
     getKanbanBoardId,
-    deleteKanbanBoardTask
+    deleteKanbanBoardTask,
+    addCommentToKanbanTask
 };
