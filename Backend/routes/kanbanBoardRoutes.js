@@ -4,7 +4,8 @@ const { createKanbanBoardTask,
         updateKanbanBoardTask,
         updateKanbanBoardTitle,
         getKanbanBoardId, 
-        deleteKanbanBoardTask} = require("../controllers/kanbanBoardController");
+        deleteKanbanBoardTask,
+        addCommentToKanbanTask} = require("../controllers/kanbanBoardController");
 const router = express.Router();
 
 router.post("/:projectId", createKanbanBoardTask);
@@ -13,3 +14,4 @@ router.put("/boardtitle/:kanbanBoardId", updateKanbanBoardTitle);
 router.put("/kanbantask/:taskId", updateKanbanBoardTask);
 router.get("/kanbanId/:projectId", getKanbanBoardId);
 router.delete("kanbantask/:taskId", deleteKanbanBoardTask);
+router.post("comment/:taskId", addCommentToKanbanTask);

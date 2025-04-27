@@ -1,5 +1,6 @@
 const KanbanBoard = require("../models/kanbanBoard");
 const KanbanBoardTask = require("../models/kanbanBoardTask");
+const Comment = require("../models/comment");
 
 const getKanbanBoardByProjectId = async (projectId) => {
     try {
