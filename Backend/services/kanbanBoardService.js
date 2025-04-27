@@ -103,7 +103,7 @@ const deleteKanbanBoardTaskById = async (taskId) => {
     }
 };
 
-const addCommentToKanbanTask = async (taskId, userId, text) => {
+const addCommentToKanbanTaskByTaskId = async (taskId, userId, text) => {
     try {
         const task = await KanbanBoardTask.findById(taskId);
 
@@ -152,6 +152,6 @@ module.exports = {
     createKanbanBoardTaskByProjectId,
     getKanbanBoardIdByProjectId,
     deleteKanbanBoardTaskById,
-    addCommentToKanbanTask,
+    addCommentToKanbanTaskByTaskId,
     getAllTasksByKanbanId
 };
