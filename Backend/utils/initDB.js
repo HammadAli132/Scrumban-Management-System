@@ -385,6 +385,7 @@ async function initDB() {
         await Comment.deleteMany({});
         await MeetingNote.deleteMany({});
         await ProjectCollaborator.deleteMany({});
+        await Commit.deleteMany({});
 
         // creating dummy users
         const users = await User.insertMany(dummyUsers);
