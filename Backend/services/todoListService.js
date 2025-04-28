@@ -38,47 +38,47 @@ const createNewToDoListTask = async (userId, taskData) => {
 
 
 const getAllToDosByUserId = async (userId) => {
-  try {
-    const todoList = await ToDoList.findOne({ userId });
-    const toDoListId = todoList._id;
+    try {
+        const todoList = await ToDoList.findOne({ userId });
+        const toDoListId = todoList._id;
 
-    const todos = await ToDoListTask.find({ toDoListId }).populate("toDoListId", "userId");
-    if (!todos) {
-      throw new Error("No todos found for this user");
+        const todos = await ToDoListTask.find({ toDoListId }).populate("toDoListId", "userId");
+        if (!todos) {
+            throw new Error("No todos found for this user");
+        }
+
+        // returning only those todos which are not in trash or are not completed
+        const filteredTodos = todos.filter(todo => !todo.inTrash && todo.status !== "completed");
+
+        return filteredTodos;
+    } catch (error) {
+        throw new Error("Error getting todos: " + error.message);
     }
-
-    // returning only those todos which are not in trash or are not completed
-    const filteredTodos = todos.filter(todo => !todo.inTrash && todo.status !== "completed");
-
-    return filteredTodos;
-  } catch (error) {
-    throw new Error("Error getting todos: " + error.message);
-  }
 }
 
 const getCompletedTodosByUserId = async (userId) => {
-  try {
-    const todoList = await ToDoList.findOne({ userId });
-    const toDoListId = todoList._id;
+    try {
+        const todoList = await ToDoList.findOne({ userId });
+        const toDoListId = todoList._id;
 
-    const todos = await ToDoListTask.find({ toDoListId, status: "completed" }).populate("toDoListId", "userId");
-    if (!todos) {
-      throw new Error("No completed todos found for this user");
+        const todos = await ToDoListTask.find({ toDoListId, status: "completed" }).populate("toDoListId", "userId");
+        if (!todos) {
+            throw new Error("No completed todos found for this user");
+        }
+        return todos;
+    } catch (error) {
+        throw new Error("Error getting completed todos: " + error.message);
     }
-    return todos;
-  } catch (error) {
-    throw new Error("Error getting completed todos: " + error.message);
-  }
 }
 
 const getTrashedTodosByUserId = async (userId) => {
     try {
         const todoList = await ToDoList.findOne({ userId });
         const toDoListId = todoList._id;
-    
+
         const todos = await ToDoListTask.find({ toDoListId, inTrash: true }).populate("toDoListId", "userId");
         if (!todos) {
-        throw new Error("No trashed todos found for this user");
+            throw new Error("No trashed todos found for this user");
         }
         return todos;
     } catch (error) {
@@ -112,7 +112,7 @@ const deleteTodoById = async (todoId) => {
     } catch (error) {
         throw new Error("Error deleting todo: " + error.message);
     }
-}   
+}
 
 const completeTodoById = async (todoId) => {
     try {
@@ -128,7 +128,37 @@ const completeTodoById = async (todoId) => {
     } catch (error) {
         throw new Error("Error completing todo: " + error.message);
     }
-}
+};
+
+const getTodayTasksByUserId = async (userId) => {
+    try {
+        // Get current date in YYYY-MM-DD format (same as stored in DB)
+        const today = new Date().toISOString().split('T')[0];
+
+        // Find the user's todo list
+        const todoList = await ToDoList.findOne({ userId });
+        if (!todoList) {
+            throw new Error("Todo list not found for this user");
+        }
+
+        // Find tasks due today that aren't completed or trashed
+        const tasks = await ToDoListTask.find({
+            toDoListId: todoList._id,
+            dueDate: today,  // Exact string match
+            status: { $ne: "completed" },
+            inTrash: false
+        }).sort({
+            priorityLevel: -1,  // High priority first
+            createdAt: 1       // Older tasks first
+        });
+
+        return tasks || [];  // Return empty array if no tasks found
+    } catch (error) {
+        throw new Error("Error getting today's tasks: " + error.message);
+    }
+};
+
+
 
 // test using this function if added any new service
 
@@ -150,5 +180,6 @@ module.exports = {
     getTrashedTodosByUserId,
     updateTodoById,
     deleteTodoById,
-    completeTodoById
+    completeTodoById,
+    getTodayTasksByUserId
 }
