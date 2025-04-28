@@ -312,61 +312,78 @@ const dummyCommits = [
     {
         message: "Initial project setup",
         hash: "a1b2c3d4e5f6g7h8i9j0",
-        file: "package.json",
+        fileName: "package.json",
+        fileContent: JSON.stringify({
+            name: "project",
+            version: "1.0.0",
+            dependencies: {
+                "express": "^4.18.2",
+                "mongoose": "^7.0.0"
+            }
+        }, null, 2),
         status: "approved"
     },
     {
         message: "Add user authentication",
         hash: "b2c3d4e5f6g7h8i9j0k1",
-        file: "authController.js",
+        fileName: "authController.js",
+        fileContent: "const express = require('express');\nconst router = express.Router();\n\n// Authentication routes here",
         status: "approved"
     },
     {
         message: "Fix login bug",
         hash: "c3d4e5f6g7h8i9j0k1l2",
-        file: "authService.js",
+        fileName: "authService.js",
+        fileContent: "function login(username, password) {\n  // Fixed login logic here\n}",
         status: "pending"
     },
     {
         message: "Update homepage design",
         hash: "d4e5f6g7h8i9j0k1l2m3",
-        file: "HomePage.jsx",
+        fileName: "HomePage.jsx",
+        fileContent: "import React from 'react';\n\nexport default function HomePage() {\n  return <div>New Design</div>\n}",
         status: "approved"
     },
     {
         message: "Refactor API endpoints",
         hash: "e5f6g7h8i9j0k1l2m3n4",
-        file: "routes/api.js",
+        fileName: "api.js",
+        fileContent: "// Refactored API routes here",
         status: "pending"
     },
     {
         message: "Add database migration",
         hash: "f6g7h8i9j0k1l2m3n4o5",
-        file: "migrations/001-initial.js",
+        fileName: "001-initial.js",
+        fileContent: "// Initial database migration",
         status: "approved"
     },
     {
         message: "Implement search functionality",
         hash: "g7h8i9j0k1l2m3n4o5p6",
-        file: "searchService.js",
+        fileName: "searchService.js",
+        fileContent: "function search(query) {\n  // Search implementation\n}",
         status: "pending"
     },
     {
         message: "Update documentation",
         hash: "h8i9j0k1l2m3n4o5p6q7",
-        file: "README.md",
+        fileName: "README.md",
+        fileContent: "# Project\n\nUpdated documentation here",
         status: "approved"
     },
     {
         message: "Fix responsive layout issues",
         hash: "i9j0k1l2m3n4o5p6q7r8",
-        file: "styles.css",
+        fileName: "styles.css",
+        fileContent: ".container {\n  max-width: 100%;\n}",
         status: "approved"
     },
     {
         message: "Add unit tests",
         hash: "j0k1l2m3n4o5p6q7r8s9",
-        file: "tests/user.test.js",
+        fileName: "user.test.js",
+        fileContent: "describe('User tests', () => {\n  // Test cases here\n})",
         status: "pending"
     }
 ];
@@ -551,18 +568,23 @@ async function initDB() {
             for (let j = 0; j < 2; j++) {
                 const commitIndex = i * 2 + j;
                 const repository = codeRepositories[i];
-                const user = users[i]; // Using the same user for simplicity
+                const user = users[i];
                 
                 const commitData = {
-                    ...dummyCommits[commitIndex],
+                    message: dummyCommits[commitIndex].message,
+                    hash: dummyCommits[commitIndex].hash,
+                    fileName: dummyCommits[commitIndex].fileName,
+                    fileContent: dummyCommits[commitIndex].fileContent,
+                    status: dummyCommits[commitIndex].status,
                     userId: user._id,
                     repositoryId: repository._id
                 };
-        
+
                 const commit = await Commit.create(commitData);
                 commits.push(commit);
             }
         }
+
         // console.log('Commits added successfully', commits);
     } catch (error) {
         console.error('Error during database initialization:', error);
