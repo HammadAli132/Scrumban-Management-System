@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const TodoList = require("../models/toDoList");
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -21,6 +22,12 @@ exports.register = async (req, res) => {
         });
 
         await newUser.save();
+
+        // Create a new TodoList for the user
+        const newTodoList = new TodoList({
+            userId: newUser._id
+        });
+        await newTodoList.save();
         res.status(201).json({ message: "User registered successfully" });
 
     } catch (error) {

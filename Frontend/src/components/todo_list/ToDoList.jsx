@@ -10,9 +10,11 @@ import ToDoItem from './ToDoItem';
 import { useToDoContext } from '../../contexts/todoContext';
 import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL;
-const userId = import.meta.env.VITE_USER_ID;
+
 
 function ToDoList() {
+    const user = JSON.parse(localStorage.getItem("user"));
+
     const { todos, setTodos } = useToDoContext();
     const [newTodo, setNewTodo] = useState("");
     const [selectedPriority, setSelectedPriority] = useState(null);
@@ -37,7 +39,7 @@ function ToDoList() {
     }
 
     const handleAddTodo = async () => {
-        const response = await axios.post(`${apiUrl}/todos/${userId}`, {
+        const response = await axios.post(`${apiUrl}/todos/${user.id}`, {
             title: newTodo,
             status: "pending",
             priorityLevel: selectedPriority,

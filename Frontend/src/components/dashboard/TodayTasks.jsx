@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check, AlertCircle, Clock } from 'lucide-react';
-
+import { Link } from 'react-router-dom';
 
 function TodayTasks({ tasks }) {
   const getPriorityIcon = (priority) => {
@@ -10,9 +10,9 @@ function TodayTasks({ tasks }) {
       case 'medium':
         return <Clock size={16} className="text-yellow-400" />;
       case 'low':
-        return <Check size={16} className="text-green-400" />;
+        return <Check size={16} className="text-blue-400" />;
       default:
-        return <Check size={16} className="text-green-400" />;
+        return <Check size={16} className="text-blue-400" />;
     }
   };
 
@@ -23,12 +23,13 @@ function TodayTasks({ tasks }) {
       case 'medium':
         return 'border-l-yellow-500';
       case 'low':
-        return 'border-l-green-500';
+        return 'border-l-blue-500';
       default:
-        return 'border-l-green-500';
+        return 'border-l-blue-500';
     }
   };
-
+  console.log(tasks);
+  
   return (
     <div className="bg-[#1c1c1c] rounded-xl p-6 shadow-lg h-full">
       <div className="flex items-center justify-between mb-6">
@@ -41,15 +42,15 @@ function TodayTasks({ tasks }) {
           {tasks.map((task) => (
             <div 
               key={task.id} 
-              className={`border-l-4 ${getPriorityClass(task.priority)} bg-[#252525] rounded-r-lg p-4 cursor-pointer transform transition-all hover:translate-x-1 hover:shadow-md`}
+              className={`border-l-4 ${getPriorityClass(task.priorityLevel)} bg-[#252525] rounded-r-lg p-4 cursor-pointer transform transition-all hover:translate-x-1 hover:shadow-md`}
             >
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="text-white font-medium mb-1">{task.title}</h3>
-                  <p className="text-gray-400 text-sm">{task.project}</p>
+                  <p className="text-gray-400 text-sm">{task.description}</p>
                 </div>
                 <div className="flex items-center ml-2">
-                  {getPriorityIcon(task.priority)}
+                  {getPriorityIcon(task.priorityLevel)}
                 </div>
               </div>
             </div>
@@ -61,9 +62,9 @@ function TodayTasks({ tasks }) {
         </div>
       )}
       
-      <button className="w-full mt-6 py-2.5 bg-[#2e2d2d] hover:bg-[#3a3939] text-gray-300 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <Link to={"/to-do-list"}><button className="w-full mt-6 py-2.5 bg-[#2e2d2d] hover:bg-[#3a3939] text-gray-300 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
         View All Tasks
-      </button>
+      </button></Link>
     </div>
   );
 }
