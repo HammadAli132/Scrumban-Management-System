@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 const { createNewToDoListTask,
-        getAllToDosByUserId,
-        getCompletedTodosByUserId,
-        getTrashedTodosByUserId,
-        updateTodoById,
-        deleteTodoById,
-        completeTodoById } = require('../services/todoListService.js');
+    getAllToDosByUserId,
+    getCompletedTodosByUserId,
+    getTrashedTodosByUserId,
+    updateTodoById,
+    deleteTodoById,
+    completeTodoById,
+    getTodayTasksByUserId } = require('../services/todoListService.js');
 
 const addNewToDoListTask = async (req, res) => {
     try {
@@ -129,6 +130,23 @@ const markToDoListTaskAsCompleted = async (req, res) => {
     }
 };
 
+const getTodayTasksFromTodoList = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(404).json({ success: false, message: "User not found!" });
+        }
+
+        const todayTasks = await getTodayTasksByUserId(userId);
+
+        res.status(200).json({ success: true, data: todayTasks });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+
 module.exports = {
     addNewToDoListTask,
     getAllToDoListTasks,
@@ -136,6 +154,7 @@ module.exports = {
     getTrashedToDoListTasks,
     updateToDoListTask,
     deleteToDoListTask,
-    markToDoListTaskAsCompleted
+    markToDoListTaskAsCompleted,
+    getTodayTasksFromTodoList
 };
 
