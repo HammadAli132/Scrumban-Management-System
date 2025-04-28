@@ -2,7 +2,9 @@ import { Outlet } from "react-router-dom";
 import NavigationBar from "./components/NavigationBar";
 import { useLocation } from "react-router-dom";
 
+
 export default function App() {
+
   const location = useLocation();
   const hideNavbar = ['/', '/signup'].includes(location.pathname);
 
