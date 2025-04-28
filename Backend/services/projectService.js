@@ -29,6 +29,60 @@ const getProjectDetailsByProjectId = async (projectId) => {
     }
 };
 
+const KanbanBoard = require('../models/kanbanBoard');
+const KanbanBoardTask = require('../models/kanbanBoardTask');
+
+const getProjectDetailsByUserId = async (userId) => {
+    try {
+        // 1. Get projects where user is the owner
+        const ownedProjects = await Project.find({ userId }).populate('userId', 'username');
+
+        // 2. Get projects where user is a collaborator
+        const collaborationRecords = await ProjectCollaborator.find({ userId }).populate('userId', 'username');
+
+        const collaboratedProjects = collaborationRecords.map(record => record.projectId);
+
+        // 3. Combine both lists and remove duplicates
+        const allProjects = [...ownedProjects, ...collaboratedProjects];
+        const uniqueProjects = allProjects.filter(
+            (project, index, self) => index === self.findIndex(p => p._id.toString() === project._id.toString())
+        );
+
+        // 4. Enrich each project with additional data
+        const enrichedProjects = await Promise.all(
+            uniqueProjects.map(async (project) => {
+                // Get kanban board for the project
+                const kanbanBoard = await KanbanBoard.findOne({ projectId: project._id });
+                
+                // Get tasks count
+                let taskCount = 0;
+                if (kanbanBoard) {
+                    taskCount = await KanbanBoardTask.countDocuments({ 
+                        kanbanBoardId: kanbanBoard._id 
+                    });
+                }
+
+                // Get collaborators count
+                const collaboratorCount = await ProjectCollaborator.countDocuments({ 
+                    projectId: project._id 
+                });
+
+                return {
+                    ...project.toObject(),
+                    kanbanTaskCount: taskCount,
+                    collaboratorCount,
+                    isOwner: project.userId._id.toString() === userId.toString()
+                };
+            })
+        );
+
+        return enrichedProjects;
+    } catch (error) {
+        throw new Error("Error getting user projects: " + error.message);
+    }
+};
+
 module.exports = {
-    getProjectDetailsByProjectId
+    getProjectDetailsByProjectId,
+    getProjectDetailsByUserId
 }
