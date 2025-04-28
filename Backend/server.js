@@ -1,12 +1,15 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
-const { logger } = require('./middleware/logger');
+const { logger } = require('./middleware/logger.js');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const { initDB } = require('./utils/initDB.js');
 
-const todoRouter = require('./routes/todoListRoutes');
+
+// All Routes
+const authRouter = require('./routes/authRoutes.js');
+const todoRouter = require('./routes/todoListRoutes.js');
+
 
 dotenv.config();
 const app = express();
@@ -17,7 +20,11 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
+
+// use the routers
 app.use("/api/v1/todos", todoRouter);
+app.use("/api/v1/auth", authRouter);
+
 
 app.get('/', (req, res) => {
 	res.send('Hello World!');
