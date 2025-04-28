@@ -347,14 +347,14 @@ const dummyCommits = [
     {
         message: "Refactor API endpoints",
         hash: "e5f6g7h8i9j0k1l2m3n4",
-        fileName: "routes/api.js",
+        fileName: "api.js",
         fileContent: "// Refactored API routes here",
         status: "pending"
     },
     {
         message: "Add database migration",
         hash: "f6g7h8i9j0k1l2m3n4o5",
-        fileName: "migrations/001-initial.js",
+        fileName: "001-initial.js",
         fileContent: "// Initial database migration",
         status: "approved"
     },
@@ -382,7 +382,7 @@ const dummyCommits = [
     {
         message: "Add unit tests",
         hash: "j0k1l2m3n4o5p6q7r8s9",
-        fileName: "tests/user.test.js",
+        fileName: "user.test.js",
         fileContent: "describe('User tests', () => {\n  // Test cases here\n})",
         status: "pending"
     }
