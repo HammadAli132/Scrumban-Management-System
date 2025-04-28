@@ -140,7 +140,7 @@ const getTodayTasksFromTodoList = async (req, res) => {
 
         const todayTasks = await getTodayTasksByUserId(userId);
 
-        res.status(200).json({ success: true, data: todayTasks });
+        res.status(200).json({ success: true, todayTasks });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }

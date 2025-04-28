@@ -2,15 +2,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import CompletedToDoItem from './CompletedToDoItem';
 const apiUrl = import.meta.env.VITE_API_URL;
-const userId = import.meta.env.VITE_USER_ID;
+
 
 function CompletedToDoList() {
+    const user = JSON.parse(localStorage.getItem("user"));
     const [completedTodos, setCompletedTodos] = useState([]);
 
     useEffect(() => {
         const fetchCompletedTodos = async () => {
             try {
-                const response = await axios.get(`${apiUrl}/todos/completed/${userId}`);
+                const response = await axios.get(`${apiUrl}/todos/completed/${user.id}`);
                 if (response.status === 200) {
                     setCompletedTodos(response.data.data);
                 }

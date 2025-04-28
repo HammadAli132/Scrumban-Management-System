@@ -134,7 +134,7 @@ const getTodayTasksByUserId = async (userId) => {
     try {
         // Get current date in YYYY-MM-DD format (same as stored in DB)
         const today = new Date().toISOString().split('T')[0];
-
+        
         // Find the user's todo list
         const todoList = await ToDoList.findOne({ userId });
         if (!todoList) {

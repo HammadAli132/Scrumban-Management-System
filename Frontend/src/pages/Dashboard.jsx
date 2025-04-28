@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProjectCard from "../components/dashboard/ProjectCard";
 import TodayTasks from "../components/dashboard/TodayTasks";
 import ProjectFilter from "../components/dashboard/ProjectFilter";
 import CreateProjectButton from "../components/dashboard/CreateProjectButton";
 import { Plus, Search } from 'lucide-react';
 import CreateProjectModal from '../components/dashboard/CreateProjectModal';
+import axios from 'axios';
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // Dummy data for projects
 const dummyProjects = [
@@ -64,6 +67,8 @@ const todayTasks = [
 ];
 
 export default function Dashboard() {
+  const user = JSON.parse(localStorage.getItem('user'));
+  const [todayTasks, setTodayTasks] = useState([]);
   const [filterType, setFilterType] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -75,6 +80,25 @@ export default function Dashboard() {
     if (searchTerm && !project.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     return true;
   });
+
+  useEffect(() => {
+    // Fetch today's tasks from the API
+    const fetchTodayTasks = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/todos/todaytasks/${user.id}`);
+        setTodayTasks(response.data.todayTasks);
+      } catch (error) {
+        console.error("Error fetching today's tasks:", error);
+      }
+    };
+
+    fetchTodayTasks();
+    console.log("Today's tasks fetched:", todayTasks);
+    
+  }, [])
+
+  console.log("Today's tasks fetched:", todayTasks);
+  
 
   return (
     <div className="px-4 py-6 md:px-6 lg:px-8">

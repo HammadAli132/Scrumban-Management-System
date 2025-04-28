@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import DeletedToDoItem from './DeletedToDoItem'; // Make sure this component exists
 const apiUrl = import.meta.env.VITE_API_URL;
-const userId = import.meta.env.VITE_USER_ID;
 
 function DeletedToDoList() {
+    const user = JSON.parse(localStorage.getItem("user"));
     const [deletedTodos, setDeletedTodos] = useState([]);
 
     useEffect(() => {
         const fetchDeletedTodos = async () => {
             try {
-                const response = await axios.get(`${apiUrl}/todos/trashed/${userId}`);
+                const response = await axios.get(`${apiUrl}/todos/trashed/${user.id}`);
                 if (response.status === 200) {
                     setDeletedTodos(response.data.data);
                 }

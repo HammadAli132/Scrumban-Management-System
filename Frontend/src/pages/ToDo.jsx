@@ -5,16 +5,16 @@ import { ToDoListContext } from "../contexts/todoContext";
 import axios from 'axios';
 import { Outlet } from 'react-router-dom';
 const apiUrl = import.meta.env.VITE_API_URL;
-const userId = import.meta.env.VITE_USER_ID;
 
 export default function ToDo() {
+    const user = JSON.parse(localStorage.getItem("user"));
     const [todos, setTodos] = useState([]);
     const [selectedTodo, setSelectedTodo] = useState(undefined);
 
     useEffect(() => {
         const fetchTodos = async () => {
             try {
-                const response = await axios.get(`${apiUrl}/todos/${userId}`);
+                const response = await axios.get(`${apiUrl}/todos/${user.id}`);
                 if (response.status !== 200) {
                     throw new Error("Failed to fetch todos");
                 }
