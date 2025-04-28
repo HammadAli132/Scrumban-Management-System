@@ -54,11 +54,19 @@ const getProjectDetailsByUserId = async (userId) => {
                 // Get kanban board for the project
                 const kanbanBoard = await KanbanBoard.findOne({ projectId: project._id });
                 
-                // Get tasks count
                 let taskCount = 0;
+                let completedTaskCount = 0;
+
                 if (kanbanBoard) {
+                    // Get tasks count
                     taskCount = await KanbanBoardTask.countDocuments({ 
                         kanbanBoardId: kanbanBoard._id 
+                    });
+
+                    // Get completed tasks count
+                    completedTaskCount = await KanbanBoardTask.countDocuments({ 
+                        kanbanBoardId: kanbanBoard._id,
+                        swimLane: 'Done' 
                     });
                 }
 
@@ -70,6 +78,7 @@ const getProjectDetailsByUserId = async (userId) => {
                 return {
                     ...project.toObject(),
                     kanbanTaskCount: taskCount,
+                    completedKanbanTaskCount: completedTaskCount,
                     collaboratorCount,
                     isOwner: project.userId._id.toString() === userId.toString()
                 };

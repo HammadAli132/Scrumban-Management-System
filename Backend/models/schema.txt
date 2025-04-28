@@ -67,7 +67,8 @@ CodeRepository {
 Commit {
     message,
     hash,
-    file,
+    fileName,
+    fileContent,
     timestamp,
     status,
     userId,
