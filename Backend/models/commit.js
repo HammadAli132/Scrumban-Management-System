@@ -12,7 +12,12 @@ const commitSchema = new mongoose.Schema({
         unique: true,
         trim: true,
     },
-    file: {
+    fileName: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    fileContent: {
         type: String,
         required: true
     },
