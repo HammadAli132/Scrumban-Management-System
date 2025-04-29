@@ -35,7 +35,6 @@ const createProjectByUserId = async (userId, projectData) => {
     }
 };
 
-
 const getProjectDetailsByProjectId = async (projectId) => {
     try {
         const project = await Project.findById(projectId);
@@ -63,8 +62,6 @@ const getProjectDetailsByProjectId = async (projectId) => {
     }
 };
 
-
-
 const getProjectDetailsByUserId = async (userId) => {
     try {
         // 1. Get projects where user is the owner
@@ -73,10 +70,8 @@ const getProjectDetailsByUserId = async (userId) => {
         // 2. Get projects where user is a collaborator
         const collaborationRecords = await ProjectCollaborator.find({ userId }).populate('userId', 'username');
 
-        const collaboratedProjects = collaborationRecords.map(record => record.projectId);
-
         // 3. Combine both lists and remove duplicates
-        const allProjects = [...ownedProjects, ...collaboratedProjects];
+        const allProjects = [...ownedProjects, ...collaborationRecords];
         const uniqueProjects = allProjects.filter(
             (project, index, self) => index === self.findIndex(p => p._id.toString() === project._id.toString())
         );
@@ -120,7 +115,6 @@ const getProjectDetailsByUserId = async (userId) => {
 
         return enrichedProjects;
     } catch (error) {
-        console.log(error.message);
         throw new Error("Error getting user projects: " + error.message);
     }
 };
