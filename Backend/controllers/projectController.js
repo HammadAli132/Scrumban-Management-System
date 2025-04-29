@@ -1,6 +1,7 @@
 const { getProjectDetailsByProjectId,
         getProjectDetailsByUserId, 
-        createProjectByUserId} = require("../services/projectService");
+        createProjectByUserId,
+        deleteProjectById} = require("../services/projectService");
 
 const createProject = async (req, res) => {
     try {
@@ -53,8 +54,25 @@ const getUserProjectsDetails = async (req, res) => {
     }
 };
 
+const deleteProject = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(projectId)) {
+            return res.status(400).json({ success: false, message: "Project not found" });
+        }
+
+        const deletedProject = await deleteProjectById(projectId);
+
+        res.status(200).json({ success: true, deletedProject });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+}
+
 module.exports = {
     getProjectDetails,
     getUserProjectsDetails,
-    createProject
+    createProject,
+    deleteProject
 }
