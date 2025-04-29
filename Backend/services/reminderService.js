@@ -18,6 +18,21 @@ const deleteTodoReminderByReminderId = async (reminderId) => {
     }
 };
 
+const getAllRemindersByUserId = async (userId) => {
+    try {
+        if (!userId) {
+            throw new Error("User ID is required");
+        }
+
+        const reminders = await Reminder.find({ userId });
+
+        return reminders;
+    } catch (error) {
+        throw new Error("Error deleting reminder: " + error.message);
+    }
+};
+
 module.exports = {
-    deleteTodoReminderByReminderId
+    deleteTodoReminderByReminderId,
+    getAllRemindersByUserId
 }

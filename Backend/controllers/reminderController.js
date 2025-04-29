@@ -1,4 +1,4 @@
-const { deleteTodoReminderByReminderId } = require('../services/reminderService');
+const { deleteTodoReminderByReminderId, getAllRemindersByUserId } = require('../services/reminderService');
 
 const deleteReminder = async (req, res) => {
     try {
@@ -16,6 +16,23 @@ const deleteReminder = async (req, res) => {
     }
 };
 
+const getUserReminders = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ success: false, message: "User not found" });
+        }
+
+        const reminders = await getAllRemindersByUserId(userId);
+
+        res.status(200).json({ success: true, reminders });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+}
+
 module.exports = {
-    deleteReminder
+    deleteReminder,
+    getUserReminders
 };

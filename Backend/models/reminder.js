@@ -18,7 +18,7 @@ const reminderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user', 
         required: true
-    },
+    }
 });
 
 const Reminder = mongoose.model('Reminder', reminderSchema);
