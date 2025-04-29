@@ -91,5 +91,6 @@ User {
 Reminder {
     title,
     description,
-    timestamp
+    timestamp,
+    userId
 }

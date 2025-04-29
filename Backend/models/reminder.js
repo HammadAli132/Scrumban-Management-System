@@ -13,7 +13,12 @@ const reminderSchema = new mongoose.Schema({
     },
     timestamp: {
         type: String,
-    }
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user', 
+        required: true
+    },
 });
 
 const Reminder = mongoose.model('Reminder', reminderSchema);

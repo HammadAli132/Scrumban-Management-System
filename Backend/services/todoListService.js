@@ -35,7 +35,8 @@ const createNewToDoListTask = async (userId, taskData) => {
             await Reminder.create({
                 title: "Todo list task reminder",
                 description: taskData.title, 
-                timestamp: taskData.reminder // Using the reminder timestamp from the task
+                timestamp: taskData.reminder, // Using the reminder timestamp from the task
+                userId: userId
             });
         }
 
