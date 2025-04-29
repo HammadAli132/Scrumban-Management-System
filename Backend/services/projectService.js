@@ -3,6 +3,7 @@ const ProjectCollaborator = require('../models/projectCollaborator');
 const MeetingNote = require('../models/meetingNote');
 const KanbanBoard = require('../models/kanbanBoard');
 const CodeRepository = require('../models/codeRepository');
+const KanbanBoardTask = require('../models/kanbanBoardTask');
 
 const createProjectByUserId = async (userId, projectData) => {
     try {
@@ -33,8 +34,7 @@ const createProjectByUserId = async (userId, projectData) => {
         throw new Error("Error getting project with collaborators: " + error.message);
     }
 };
-const KanbanBoard = require('../models/kanbanBoard');
-const KanbanBoardTask = require('../models/kanbanBoardTask');
+
 
 const getProjectDetailsByProjectId = async (projectId) => {
     try {
