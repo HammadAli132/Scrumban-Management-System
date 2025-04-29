@@ -1,5 +1,6 @@
 const ToDoList = require("../models/toDoList");
 const ToDoListTask = require("../models/toDoListTask");
+const Reminder = require("../models/reminder");
 
 // uncomment this line to create connection to the database while testing
 
@@ -28,6 +29,15 @@ const createNewToDoListTask = async (userId, taskData) => {
             ...taskData,
             toDoListId,
         });
+
+        if (taskData.reminder) {
+            // Create a new reminder entry
+            await Reminder.create({
+                title: "Todo list task reminder",
+                description: taskData.title, 
+                timestamp: taskData.reminder // Using the reminder timestamp from the task
+            });
+        }
 
         return newTask;
     } catch (error) {
