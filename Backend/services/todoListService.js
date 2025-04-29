@@ -103,9 +103,19 @@ const updateTodoById = async (todoId, updateData) => {
             { _id: todoId },
             updateData,
             { new: true }
-        );
+        ).populate('toDoListId', 'userId'); // Populate just the userId from ToDoList
+
         if (!updatedTodo) {
             throw new Error("Todo not found");
+        }
+
+        if (updateData.reminder) {
+            await Reminder.create({
+                title: "Todo list task reminder",
+                description: updatedTodo.title, 
+                timestamp: updateData.reminder, // Use the reminder timestamp
+                userId: updatedTodo.toDoListId.userId 
+            });
         }
         return updatedTodo;
     } catch (error) {

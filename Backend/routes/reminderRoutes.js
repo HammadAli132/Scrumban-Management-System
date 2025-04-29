@@ -6,4 +6,4 @@ const { deleteReminder,
 const router = express.Router();
 
 router.delete('/:reminderId', deleteReminder);
-router.get("/:userId", getUserReminders)
+router.get("/:userId", getUserReminders);
