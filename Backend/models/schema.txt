@@ -87,3 +87,9 @@ User {
     image,
     email
 }
+
+Reminder {
+    title,
+    description,
+    timestamp
+}
