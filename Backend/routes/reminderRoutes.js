@@ -9,3 +9,5 @@ const router = express.Router();
 router.delete('/:reminderId', deleteReminder);
 router.delete('/userreminders/:userId', deleteUserReminders);
 router.get("/:userId", getUserReminders);
+
+module.exports = router;

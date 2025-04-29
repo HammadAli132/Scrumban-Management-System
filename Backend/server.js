@@ -9,7 +9,7 @@ const { initDB } = require('./utils/initDB.js');
 // All Routes
 const authRouter = require('./routes/authRoutes.js');
 const todoRouter = require('./routes/todoListRoutes.js');
-
+const reminderRouter = require("./routes/reminderRoutes.js");
 
 dotenv.config();
 const app = express();
@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 5000;
 // use the routers
 app.use("/api/v1/todos", todoRouter);
 app.use("/api/v1/auth", authRouter);
-
+app.use("/api/v1/reminders", reminderRouter);
 
 app.get('/', (req, res) => {
 	res.send('Hello World!');
