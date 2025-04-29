@@ -53,5 +53,6 @@ const getUserProjectsDetails = async (req, res) => {
 
 module.exports = {
     getProjectDetails,
-    getUserProjectsDetails
+    getUserProjectsDetails,
+    createProject
 }
