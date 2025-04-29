@@ -69,7 +69,7 @@ export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Filter projects based on ownership and search term
-  const filteredProjects = dummyProjects.filter(project => {
+  const filteredProjects = projects.filter(project => {
     if (filterType === 'owned' && !project.isOwned) return false;
     if (filterType === 'collaborated' && project.isOwned) return false;
     if (searchTerm && !project.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
@@ -158,7 +158,7 @@ export default function Dashboard() {
                     progress={project.progress}
                     isOwned={project.isOwned}
                     collaborators={project.collaborators}
-                    dueDate={project.dueDate}
+                    dueDate={project.endDate.split('T')[0]}
                   />
                 ))}
               </div>
