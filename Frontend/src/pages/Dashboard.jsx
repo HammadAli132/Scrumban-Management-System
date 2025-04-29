@@ -11,46 +11,46 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 // Dummy data for projects
 const dummyProjects = [
-  { 
-    id: 1, 
-    name: "Analytics Dashboard", 
-    description: "Data visualization platform for marketing metrics", 
+  {
+    id: 1,
+    name: "Analytics Dashboard",
+    description: "Data visualization platform for marketing metrics",
     progress: 75,
     isOwned: true,
     collaborators: 3,
     dueDate: "2023-12-15"
   },
-  { 
-    id: 2, 
-    name: "Mobile App Redesign", 
-    description: "UX/UI improvements for the mobile experience", 
+  {
+    id: 2,
+    name: "Mobile App Redesign",
+    description: "UX/UI improvements for the mobile experience",
     progress: 40,
     isOwned: false,
     collaborators: 5,
     dueDate: "2023-11-30"
   },
-  { 
-    id: 3, 
-    name: "API Integration", 
-    description: "Connect with third-party payment systems", 
+  {
+    id: 3,
+    name: "API Integration",
+    description: "Connect with third-party payment systems",
     progress: 90,
     isOwned: true,
     collaborators: 2,
     dueDate: "2023-12-05"
   },
-  { 
-    id: 4, 
-    name: "Documentation", 
-    description: "Create comprehensive developer docs", 
+  {
+    id: 4,
+    name: "Documentation",
+    description: "Create comprehensive developer docs",
     progress: 30,
     isOwned: true,
     collaborators: 1,
     dueDate: "2023-12-20"
   },
-  { 
-    id: 5, 
-    name: "Marketing Website", 
-    description: "Product landing page and content strategy", 
+  {
+    id: 5,
+    name: "Marketing Website",
+    description: "Product landing page and content strategy",
     progress: 60,
     isOwned: false,
     collaborators: 4,
@@ -58,17 +58,12 @@ const dummyProjects = [
   },
 ];
 
-// Dummy tasks for today
-const todayTasks = [
-  { id: 1, title: "Review pull requests", project: "API Integration", priority: "high" },
-  { id: 2, title: "Update user flow diagrams", project: "Mobile App Redesign", priority: "medium" },
-  { id: 3, title: "Create content outline", project: "Marketing Website", priority: "low" },
-  { id: 4, title: "Debug authentication issue", project: "API Integration", priority: "high" },
-];
+
 
 export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem('user'));
   const [todayTasks, setTodayTasks] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [filterType, setFilterType] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -94,11 +89,26 @@ export default function Dashboard() {
 
     fetchTodayTasks();
     console.log("Today's tasks fetched:", todayTasks);
-    
+
   }, [])
 
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/projects/userprojects/${user.id}`);
+        setProjects(response.data.projects);
+
+      } catch (error) {
+        console.error("Error fetching projects:", error.response.data);
+      }
+    }
+
+    fetchProjects();
+  }, [])
+
+  console.log("Projects fetched:", projects);
   console.log("Today's tasks fetched:", todayTasks);
-  
+
 
   return (
     <div className="px-4 py-6 md:px-6 lg:px-8">
@@ -110,9 +120,9 @@ export default function Dashboard() {
         </div>
         <div className="flex mt-4 md:mt-0 gap-3">
           <div className="relative">
-            <input 
-              type="text" 
-              placeholder="Search projects..." 
+            <input
+              type="text"
+              placeholder="Search projects..."
               className="bg-[#2a2a2a] text-gray-200 pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -136,14 +146,14 @@ export default function Dashboard() {
               <h2 className="text-xl font-semibold text-white">Your Projects</h2>
               <ProjectFilter activeFilter={filterType} onFilterChange={setFilterType} />
             </div>
-            
+
             {filteredProjects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredProjects.map((project) => (
-                  <ProjectCard 
-                    key={project.id} 
-                    id={project.id} 
-                    title={project.name} 
+                  <ProjectCard
+                    key={project.id}
+                    id={project.id}
+                    title={project.name}
                     description={project.description}
                     progress={project.progress}
                     isOwned={project.isOwned}
@@ -155,7 +165,7 @@ export default function Dashboard() {
             ) : (
               <div className="text-center py-8">
                 <p className="text-gray-500">No projects found matching your criteria</p>
-                <button 
+                <button
                   className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center mx-auto hover:bg-blue-700 transition-colors"
                   onClick={() => setShowCreateModal(true)}
                 >

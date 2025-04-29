@@ -1,6 +1,8 @@
 const Project = require('../models/project');
 const ProjectCollaborator = require('../models/projectCollaborator');
 const MeetingNote = require('../models/meetingNote');
+const KanbanBoard = require('../models/kanbanBoard');
+const KanbanBoardTask = require('../models/kanbanBoardTask');
 
 const getProjectDetailsByProjectId = async (projectId) => {
     try {
@@ -29,8 +31,7 @@ const getProjectDetailsByProjectId = async (projectId) => {
     }
 };
 
-const KanbanBoard = require('../models/kanbanBoard');
-const KanbanBoardTask = require('../models/kanbanBoardTask');
+
 
 const getProjectDetailsByUserId = async (userId) => {
     try {
@@ -87,6 +88,7 @@ const getProjectDetailsByUserId = async (userId) => {
 
         return enrichedProjects;
     } catch (error) {
+        console.log(error.message);
         throw new Error("Error getting user projects: " + error.message);
     }
 };

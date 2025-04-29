@@ -1,6 +1,8 @@
 const { getProjectDetailsByProjectId,
     getProjectDetailsByUserId } = require("../services/projectService");
 
+const mongoose = require("mongoose");
+
 const getProjectDetails = async (req, res) => {
     try {
         const { projectId } = req.params;
@@ -28,7 +30,7 @@ const getUserProjectsDetails = async (req, res) => {
 
         const userProjects = await getProjectDetailsByUserId(userId);
 
-        res.status(200).json({ success: true, data: userProjects });
+        res.status(200).json({ success: true, projects: userProjects });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }

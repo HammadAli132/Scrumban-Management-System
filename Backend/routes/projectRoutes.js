@@ -5,3 +5,5 @@ const { getProjectDetails,
 
 router.get("/:projectId", getProjectDetails);
 router.get("/userprojects/:userId", getUserProjectsDetails);
+
+module.exports = router;
