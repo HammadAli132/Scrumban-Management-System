@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { Bell, Menu, X, LogOut } from 'lucide-react';
 import axios from "axios"
+import { useLocation } from 'react-router-dom';
 const apiUrl = import.meta.env.VITE_API_URL
 
 function Navbar() {
+  const location = useLocation();
   const user = JSON.parse(localStorage.getItem('user'));
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
@@ -20,7 +22,7 @@ function Navbar() {
     }
 
     getNotifications();
-  }, [])
+  }, [location.pathname])
 
   console.log("Notifications:", notifications);
 
@@ -40,7 +42,14 @@ function Navbar() {
   };
 
   const markAllAsRead = async () => {
-    
+    try {
+      const response = await axios.delete(`${apiUrl}/reminders/userreminders/${user.id}`);
+      if (response.status === 200) {
+        setNotifications([]);
+      }
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error.response.data);
+    }
   };
 
   const handleLogout = () => {
