@@ -32,7 +32,22 @@ const getAllRemindersByUserId = async (userId) => {
     }
 };
 
+const deleteAllRemindersByUserId = async (userId) => {
+    try {
+        if (!userId) {
+            throw new Error("User ID is required");
+        }
+
+        const result = await Reminder.deleteMany({ userId });
+
+        return result.deletedCount;
+    } catch (error) {
+        throw new Error("Error deleting reminders: " + error.message);
+    }
+}
+
 module.exports = {
     deleteTodoReminderByReminderId,
-    getAllRemindersByUserId
+    getAllRemindersByUserId,
+    deleteAllRemindersByUserId
 }
