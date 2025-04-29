@@ -1,6 +1,38 @@
 const Project = require('../models/project');
 const ProjectCollaborator = require('../models/projectCollaborator');
 const MeetingNote = require('../models/meetingNote');
+const KanbanBoard = require('../models/kanbanBoard');
+const CodeRepository = require('../models/codeRepository');
+
+const createProjectByUserId = async (userId, projectData) => {
+    try {
+        if (!userId) {
+            throw new Error("User ID is required");
+        }
+
+        // Create the project
+        const project = await Project.create({
+            ...projectData,
+            userId
+        });
+
+        // Create default Kanban board for the project
+        const kanbanBoard = await KanbanBoard.create({
+            title: `${projectData.title || 'Project'} Board`,
+            projectId: project._id
+        });
+
+        // Create default code repository for the project
+        const codeRepository = await CodeRepository.create({
+            name: `${projectData.title || 'Project'} Repository`,
+            projectId: project._id
+        });
+
+        return project;
+    } catch (error) {
+        throw new Error("Error getting project with collaborators: " + error.message);
+    }
+};
 
 const getProjectDetailsByProjectId = async (projectId) => {
     try {
@@ -93,5 +125,6 @@ const getProjectDetailsByUserId = async (userId) => {
 
 module.exports = {
     getProjectDetailsByProjectId,
-    getProjectDetailsByUserId
+    getProjectDetailsByUserId,
+    createProjectByUserId
 }
