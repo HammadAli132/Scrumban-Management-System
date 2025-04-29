@@ -70,8 +70,14 @@ const getProjectDetailsByUserId = async (userId) => {
         // 2. Get projects where user is a collaborator
         const collaborationRecords = await ProjectCollaborator.find({ userId }).populate('userId', 'username');
 
+        // Get the actual project documents for collaborated projects
+        const collaboratedProjectIds = collaborationRecords.map(record => record.projectId._id);
+        const collaboratedProjects = await Project.find({
+            _id: { $in: collaboratedProjectIds }
+        }).populate('userId', 'username');
+
         // 3. Combine both lists and remove duplicates
-        const allProjects = [...ownedProjects, ...collaborationRecords];
+        const allProjects = [...ownedProjects, ...collaboratedProjects];
         const uniqueProjects = allProjects.filter(
             (project, index, self) => index === self.findIndex(p => p._id.toString() === project._id.toString())
         );
@@ -118,6 +124,14 @@ const getProjectDetailsByUserId = async (userId) => {
         throw new Error("Error getting user projects: " + error.message);
     }
 };
+
+// const deleteProjectById = async (projectId) => {
+//     try {
+        
+//     } catch (error) {
+//         throw new Error("Error deleting project: " + error.message);
+//     }
+// };
 
 module.exports = {
     getProjectDetailsByProjectId,
