@@ -3,62 +3,11 @@ import ProjectCard from "../components/dashboard/ProjectCard";
 import TodayTasks from "../components/dashboard/TodayTasks";
 import ProjectFilter from "../components/dashboard/ProjectFilter";
 import CreateProjectButton from "../components/dashboard/CreateProjectButton";
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Loader2 } from 'lucide-react';
 import CreateProjectModal from '../components/dashboard/CreateProjectModal';
 import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
-
-// Dummy data for projects
-const dummyProjects = [
-  {
-    id: 1,
-    name: "Analytics Dashboard",
-    description: "Data visualization platform for marketing metrics",
-    progress: 75,
-    isOwned: true,
-    collaborators: 3,
-    dueDate: "2023-12-15"
-  },
-  {
-    id: 2,
-    name: "Mobile App Redesign",
-    description: "UX/UI improvements for the mobile experience",
-    progress: 40,
-    isOwned: false,
-    collaborators: 5,
-    dueDate: "2023-11-30"
-  },
-  {
-    id: 3,
-    name: "API Integration",
-    description: "Connect with third-party payment systems",
-    progress: 90,
-    isOwned: true,
-    collaborators: 2,
-    dueDate: "2023-12-05"
-  },
-  {
-    id: 4,
-    name: "Documentation",
-    description: "Create comprehensive developer docs",
-    progress: 30,
-    isOwned: true,
-    collaborators: 1,
-    dueDate: "2023-12-20"
-  },
-  {
-    id: 5,
-    name: "Marketing Website",
-    description: "Product landing page and content strategy",
-    progress: 60,
-    isOwned: false,
-    collaborators: 4,
-    dueDate: "2023-11-28"
-  },
-];
-
-
 
 export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem('user'));
@@ -67,12 +16,15 @@ export default function Dashboard() {
   const [filterType, setFilterType] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [loadingTasks, setLoadingTasks] = useState(true);
+  const [error, setError] = useState(null);
 
   // Filter projects based on ownership and search term
   const filteredProjects = projects.filter(project => {
-    if (filterType === 'owned' && !project.isOwned) return false;
-    if (filterType === 'collaborated' && project.isOwned) return false;
-    if (searchTerm && !project.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    if (filterType === 'owned' && !project.isOwner) return false;
+    if (filterType === 'collaborated' && project.isOwner) return false;
+    if (searchTerm && !project.title.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     return true;
   });
 
@@ -84,31 +36,46 @@ export default function Dashboard() {
         setTodayTasks(response.data.todayTasks);
       } catch (error) {
         console.error("Error fetching today's tasks:", error);
+        setError("Failed to load today's tasks");
+      } finally {
+        setLoadingTasks(false);
       }
     };
 
     fetchTodayTasks();
-    console.log("Today's tasks fetched:", todayTasks);
-
-  }, [])
+  }, []);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(`${apiUrl}/projects/userprojects/${user.id}`);
         setProjects(response.data.projects);
-
       } catch (error) {
-        console.error("Error fetching projects:", error.response.data);
+        console.error("Error fetching projects:", error.response?.data);
+        setError("Failed to load projects");
+      } finally {
+        setLoadingProjects(false);
       }
     }
 
     fetchProjects();
-  }, [])
+  }, []);
 
-  console.log("Projects fetched:", projects);
-  console.log("Today's tasks fetched:", todayTasks);
+  console.log("Projects:", projects);
+  
 
+  // Function to transform API project data to match component expectations
+  const transformProjectData = (project) => ({
+    id: project._id,
+    title: project.title,
+    description: project.description,
+    progress: project.kanbanTaskCount > 0 
+      ? Math.round((project.completedKanbanTaskCount / project.kanbanTaskCount) * 100)
+      : 0,
+    isOwned: project.isOwner,
+    collaborators: project.collaboratorCount,
+    dueDate: project.endDate.split('T')[0]
+  });
 
   return (
     <div className="px-4 py-6 md:px-6 lg:px-8">
@@ -136,7 +103,13 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Today's tasks section */}
         <div className="lg:col-span-1">
-          <TodayTasks tasks={todayTasks} />
+          {loadingTasks ? (
+            <div className="flex justify-center items-center h-40">
+              <Loader2 className="animate-spin text-blue-500 h-8 w-8" />
+            </div>
+          ) : (
+            <TodayTasks tasks={todayTasks} />
+          )}
         </div>
 
         {/* Projects section */}
@@ -147,18 +120,26 @@ export default function Dashboard() {
               <ProjectFilter activeFilter={filterType} onFilterChange={setFilterType} />
             </div>
 
-            {filteredProjects.length > 0 ? (
+            {loadingProjects ? (
+              <div className="flex justify-center items-center h-40">
+                <Loader2 className="animate-spin text-blue-500 h-8 w-8" />
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-red-500">
+                {error}
+                <button
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  onClick={() => window.location.reload()}
+                >
+                  Retry
+                </button>
+              </div>
+            ) : filteredProjects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredProjects.map((project) => (
+                {filteredProjects.map((_project) => (
                   <ProjectCard
-                    key={project.id}
-                    id={project.id}
-                    title={project.name}
-                    description={project.description}
-                    progress={project.progress}
-                    isOwned={project.isOwned}
-                    collaborators={project.collaborators}
-                    dueDate={project.endDate.split('T')[0]}
+                    key={_project._id}
+                    {...transformProjectData(_project)}
                   />
                 ))}
               </div>
