@@ -7,3 +7,5 @@ const router = express.Router();
 
 router.delete('/:reminderId', deleteReminder);
 router.get("/:userId", getUserReminders);
+
+module.exports = router;

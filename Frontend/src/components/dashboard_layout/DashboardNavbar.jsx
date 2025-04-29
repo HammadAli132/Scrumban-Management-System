@@ -1,47 +1,46 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Bell, Menu, X, LogOut } from 'lucide-react';
+import axios from "axios"
+const apiUrl = import.meta.env.VITE_API_URL
 
 function Navbar() {
+  const user = JSON.parse(localStorage.getItem('user'));
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
-  const [notifications, setNotifications] = React.useState([
-    {
-      id: 1,
-      title: 'New task assigned',
-      message: 'You have been assigned a new project task',
-      read: false,
-      time: '2 hours ago'
-    },
-    {
-      id: 2,
-      title: 'Meeting reminder',
-      message: 'Team sync meeting in 15 minutes',
-      read: false,
-      time: '30 minutes ago'
-    },
-    {
-      id: 3,
-      title: 'System update',
-      message: 'New features available in dashboard',
-      read: true,
-      time: '1 day ago'
+  const [notifications, setNotifications] = React.useState([]);
+
+  useEffect(() => {
+    const getNotifications = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/reminders/${user.id}`);
+        setNotifications(response.data.reminders);
+      } catch (error) {
+        console.error("Error fetching notifications:", error.response.data);
+      }
     }
-  ]);
+
+    getNotifications();
+  }, [])
+
+  console.log("Notifications:", notifications);
+
 
   const unreadNotifications = notifications.filter(n => !n.read).length;
   const hasUnread = unreadNotifications > 0;
 
-  const markAsRead = (id) => {
-    setNotifications(notifications.map(notification =>
-      notification.id === id ? { ...notification, read: true } : notification
-    ));
+  const markAsRead = async (id) => {
+    try {
+      const response = await axios.delete(`${apiUrl}/reminders/${id}`);
+      if (response.status === 200) {
+        setNotifications(notifications.filter(notification => notification._id !== id));
+      }
+    } catch (error) {
+      console.error("Error marking notification as read:", error.response.data);
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(notification => ({
-      ...notification,
-      read: true
-    })));
+  const markAllAsRead = async () => {
+    
   };
 
   const handleLogout = () => {
@@ -103,23 +102,21 @@ function Navbar() {
                   ) : (
                     notifications.map(notification => (
                       <div
-                        key={notification.id}
-                        className={`p-3 border-b border-[#2e2d2d] ${!notification.read ? 'bg-[#1e1e1e]' : ''}`}
+                        key={notification._id}
+                        className={`p-3 border-b border-[#2e2d2d] bg-[#1e1e1e]`}
                       >
                         <div className="flex justify-between items-start">
                           <div>
                             <h4 className="text-white font-medium">{notification.title}</h4>
-                            <p className="text-gray-400 text-sm">{notification.message}</p>
-                            <p className="text-gray-500 text-xs mt-1">{notification.time}</p>
+                            <p className="text-gray-400 text-sm">{notification.description}</p>
+                            <p className="text-gray-500 text-xs mt-1">{notification.timestamp}</p>
                           </div>
-                          {!notification.read && (
-                            <button
-                              onClick={() => markAsRead(notification.id)}
-                              className="text-xs text-blue-400 hover:text-blue-300"
-                            >
-                              Mark as read
-                            </button>
-                          )}
+                          <button
+                            onClick={() => markAsRead(notification._id)}
+                            className="text-xs text-blue-400 hover:text-blue-300"
+                          >
+                            Mark as read
+                          </button>
                         </div>
                       </div>
                     ))
