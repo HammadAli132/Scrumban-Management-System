@@ -4,6 +4,8 @@ const MeetingNote = require('../models/meetingNote');
 const KanbanBoard = require('../models/kanbanBoard');
 const CodeRepository = require('../models/codeRepository');
 const KanbanBoardTask = require('../models/kanbanBoardTask');
+const Commit = require('../models/commit');
+const Comment = require('../models/comment');
 
 const createProjectByUserId = async (userId, projectData) => {
     try {
@@ -87,26 +89,26 @@ const getProjectDetailsByUserId = async (userId) => {
             uniqueProjects.map(async (project) => {
                 // Get kanban board for the project
                 const kanbanBoard = await KanbanBoard.findOne({ projectId: project._id });
-                
+
                 let taskCount = 0;
                 let completedTaskCount = 0;
 
                 if (kanbanBoard) {
                     // Get tasks count
-                    taskCount = await KanbanBoardTask.countDocuments({ 
-                        kanbanBoardId: kanbanBoard._id 
+                    taskCount = await KanbanBoardTask.countDocuments({
+                        kanbanBoardId: kanbanBoard._id
                     });
 
                     // Get completed tasks count
-                    completedTaskCount = await KanbanBoardTask.countDocuments({ 
+                    completedTaskCount = await KanbanBoardTask.countDocuments({
                         kanbanBoardId: kanbanBoard._id,
-                        swimLane: 'Done' 
+                        swimLane: 'Done'
                     });
                 }
 
                 // Get collaborators count
-                const collaboratorCount = await ProjectCollaborator.countDocuments({ 
-                    projectId: project._id 
+                const collaboratorCount = await ProjectCollaborator.countDocuments({
+                    projectId: project._id
                 });
 
                 return {
@@ -125,16 +127,46 @@ const getProjectDetailsByUserId = async (userId) => {
     }
 };
 
-// const deleteProjectById = async (projectId) => {
-//     try {
-        
-//     } catch (error) {
-//         throw new Error("Error deleting project: " + error.message);
-//     }
-// };
+const deleteProjectById = async (projectId) => {
+    try {
+        const project = await Project.findById(projectId);
+
+        if (!project) {
+            throw new Error("Project not found");
+        }
+
+        // delete kanban board as well as its tasks and comments related to them
+        const kanbanBoard = await KanbanBoard.find({ projectId });
+        const kanbanBoardTasks = await KanbanBoardTask.find({kanbanBoardId: kanbanBoard._id});
+        const kanbanBoardTaskIds = kanbanBoardTasks.map(tasks => tasks._id);
+        await Comment.deleteMany({kanbanBoardTaskId: { $in: kanbanBoardTaskIds }});
+        await KanbanBoardTask.deleteMany({kanbanBoardId: kanbanBoard._id});
+
+        await KanbanBoard.deleteOne({ projectId: project });
+
+        //delete the code repository asscoiated with the project and its related commits
+        const repo = await CodeRepository.findOne({ projectId: projectId });
+        await Commit.deleteMany({ repositoryId: repo._id });
+        await CodeRepository.deleteOne({ projectId: projectId });
+
+        // delete all other related data
+        await Promise.all([
+            MeetingNote.deleteMany({ projectId }),
+            Sprint.deleteMany({ projectId }),
+            ProjectCollaborator.deleteMany({ projectId })
+        ]);
+
+        const deletedProject = await Project.findByIdAndDelete(projectId);
+
+        return deletedProject;
+    } catch (error) {
+        throw new Error("Error deleting project: " + error.message);
+    }
+};
 
 module.exports = {
     getProjectDetailsByProjectId,
     getProjectDetailsByUserId,
-    createProjectByUserId
+    createProjectByUserId,
+    deleteProjectById
 }
