@@ -1,0 +1,21 @@
+const { deleteTodoReminderByReminderId } = require('../services/reminderService');
+
+const deleteReminder = async (req, res) => {
+    try {
+        const { reminderId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(reminderId)) {
+            return res.status(400).json({ success: false, message: "Reminder not found" });
+        }
+
+        const deletedReminder = await deleteTodoReminderByReminderId(reminderId);
+
+        res.status(200).json({ success: true, data: deletedReminder });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+module.exports = {
+    deleteReminder
+};
