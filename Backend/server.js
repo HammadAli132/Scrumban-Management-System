@@ -11,6 +11,7 @@ const authRouter = require('./routes/authRoutes.js');
 const todoRouter = require('./routes/todoListRoutes.js');
 const reminderRouter = require("./routes/reminderRoutes.js");
 const projectRouter = require("./routes/projectRoutes.js");
+const sprintRouter = require("./routes/sprintRoutes.js");
 
 dotenv.config();
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/v1/todos", todoRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/reminders", reminderRouter);
 app.use("/api/v1/projects", projectRouter);
+app.use("/api/v1/sprints", sprintRouter);
 
 app.get('/', (req, res) => {
 	res.send('Hello World!');
