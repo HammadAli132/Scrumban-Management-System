@@ -10,7 +10,7 @@ import {
 	LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
 	ResponsiveContainer, Legend
 } from 'recharts';
-import { getInitials } from '../../utils/avatarUtils';
+import { getInitials, getAvatarColor } from '../../utils/avatarUtils';
 import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -382,7 +382,7 @@ function ProjectDetails() {
 
 	const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-
+	
 
 	if (loading) {
 		return <div className="text-white w-full h-full flex items-center justify-center">Loading...</div>;
@@ -452,7 +452,7 @@ function ProjectDetails() {
 															<div className="text-sm text-gray-400 mr-4">
 																{convertDate(new Date(task.dueDate).toLocaleDateString())}
 															</div>
-															<div className={`w-6 h-6 rounded-full ${["bg-purple-700", "bg-red-700", "bg-blue-700", "bg-green-700", "bg-yellow-700"][Math.floor(Math.random() * (5 - 0 + 1)) + 0]}  flex items-center justify-center text-white text-xs font-medium`}>
+															<div style={{ backgroundColor: getAvatarColor(task.user.name) }} className={`w-6 h-6 rounded-full  flex items-center justify-center text-white text-xs font-medium`}>
 																{getInitials(task.user.name)}
 															</div>
 														</div>
@@ -587,8 +587,9 @@ function ProjectDetails() {
 						<div className="flex -space-x-2 mb-4">
 							{project.collaborators.map(collaborator => (
 								<div
+									style={{ backgroundColor: getAvatarColor(collaborator.userId.name) }}
 									key={collaborator._id}
-									className={`w-10 h-10 rounded-full border-2 border-[#1c1c1c] ${["bg-purple-700", "bg-red-700", "bg-blue-700", "bg-green-700", "bg-yellow-700"][Math.floor(Math.random() * (5 - 0 + 1)) + 0]} flex items-center justify-center text-white font-medium`}
+									className={`w-10 h-10 rounded-full border-2 border-[#1c1c1c]  flex items-center justify-center text-white font-medium`}
 								>
 									{getInitials(collaborator.userId.name)}
 								</div>

@@ -74,3 +74,40 @@ export const generateSeededAvatar = (seed) => {
     initials: typeof seed === 'string' ? getInitials(seed) : String(seed).substring(0, 2),
   };
 };
+
+export function getAvatarColor(name) {
+  // List of dark colors in hex format
+  const darkColors = [
+    "#1E293B", // slate-800
+    "#1E3A8A", // blue-900
+    "#312E81", // indigo-900
+    "#4C1D95", // purple-900
+    "#581C87", // fuchsia-900
+    "#701A75", // pink-900
+    "#831843", // rose-900
+    "#7F1D1D", // red-900
+    "#7C2D12", // orange-900
+    "#713F12", // amber-900
+    "#365314", // lime-900
+    "#14532D", // green-900
+    "#134E4A", // teal-900
+    "#164E63", // cyan-900
+    "#0C4A6E"  // sky-900
+  ];
+
+  // Create a simple hash from the name
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    // Use char code and position to create hash
+    hash = ((hash << 5) - hash) + name.charCodeAt(i);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  
+  // Ensure hash is positive by taking absolute value
+  hash = Math.abs(hash);
+  
+  // Use hash to pick a color from the list
+  const colorIndex = hash % darkColors.length;
+  
+  return darkColors[colorIndex];
+}
