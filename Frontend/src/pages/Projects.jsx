@@ -10,6 +10,9 @@ import {
 	LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
 	ResponsiveContainer, Legend
 } from 'recharts';
+import { getInitials } from '../../utils/avatarUtils';
+import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // This would normally come from your API or state management
 const dummyProject = {
@@ -93,6 +96,12 @@ const dummyMeetingNotes = [
 	}
 ];
 
+const convertDate = (dateString) => {
+	const date = new Date(dateString);
+	const options = { year: 'numeric', month: 'long', day: 'numeric' };
+	return date.toLocaleDateString('en-US', options)
+}
+
 // Generate burndown chart data
 const generateBurndownData = (sprints) => {
 	const allTasks = sprints.flatMap(sprint => sprint.tasks);
@@ -138,6 +147,7 @@ const generateBurndownData = (sprints) => {
 
 function ProjectDetails() {
 	const { projectid } = useParams();
+	const [loading, setLoading] = useState(true);
 	const [project, setProject] = useState(dummyProject);
 	const [sprints, setSprints] = useState(dummySprints);
 	const [meetingNotes, setMeetingNotes] = useState(dummyMeetingNotes);
@@ -155,12 +165,44 @@ function ProjectDetails() {
 
 	useEffect(() => {
 		// In a real app, you would fetch project, sprints, and other data here
+		const getSprintData = async () => {
+			try {
+				const response = await axios.get(`${apiUrl}/sprints/project/${projectid}`);
+				setSprints(response.data.sprints);
+				console.log("Sprints: ", response.data.sprints);
+				
+			} catch (error) {
+				console.error("Error fetching sprints:", error);
+			}
+		}
+		const getProjectData = async () => {
+			try {
+				const response = await axios.get(`${apiUrl}/projects/${projectid}`);
+				setProject(response.data.project);
+				console.log("Project: ", response.data.project);
+				
+			} catch (error) {
+				console.error("Error fetching project:", error);
+			}
+		}
+
+		const initializeData = async () => {
+			await getSprintData();
+			await getProjectData();
+			setLoading(false);
+		}
+
+		initializeData();
+	}, []);
+
+	useEffect(() => {
 		setBurndownData(generateBurndownData(sprints));
-	}, [sprints]);
+
+	}, [sprints])
 
 	const toggleSprintExpand = (sprintId) => {
 		setSprints(sprints.map(sprint =>
-			sprint.id === sprintId
+			sprint._id === sprintId
 				? { ...sprint, isExpanded: !sprint.isExpanded }
 				: sprint
 		));
@@ -248,6 +290,10 @@ function ProjectDetails() {
 	const completedTasks = sprints.reduce((acc, sprint) =>
 		acc + sprint.tasks.filter(task => task.swimLane === 'Done').length, 0);
 
+	if (loading) {
+		return <div className="text-white w-full h-full flex items-center justify-center">Loading...</div>;
+	}
+
 	return (
 		<div className="px-4 py-6 md:px-6 lg:px-8">
 			{/* Header Section */}
@@ -255,8 +301,8 @@ function ProjectDetails() {
 				<Link to="/dashboard" className="inline-flex items-center text-blue-500 hover:text-blue-400 mb-4">
 					<ArrowLeft size={16} className="mr-2" /> Back to Dashboard
 				</Link>
-				<h1 className="text-2xl font-bold text-white">{project.name}</h1>
-				<p className="text-gray-400 mt-2">{project.description}</p>
+				<h1 className="text-2xl font-bold text-white">{project.project.title}</h1>
+				<p className="text-gray-400 mt-2">{project.project.description}</p>
 			</div>
 
 			{/* Main Content */}
@@ -277,10 +323,10 @@ function ProjectDetails() {
 
 						<div className="space-y-4">
 							{sprints.map(sprint => (
-								<div key={sprint.id} className="border border-[#333] rounded-lg overflow-hidden">
+								<div key={sprint._id} className="border border-[#333] rounded-lg overflow-hidden">
 									<div
 										className="flex items-center justify-between p-4 bg-[#252525] cursor-pointer"
-										onClick={() => toggleSprintExpand(sprint.id)}
+										onClick={() => toggleSprintExpand(sprint._id)}
 									>
 										<div className="flex items-center">
 											{sprint.isExpanded ?
@@ -290,7 +336,7 @@ function ProjectDetails() {
 											<h3 className="font-medium text-white">{sprint.title}</h3>
 										</div>
 										<div className="text-sm text-gray-400">
-											{new Date(sprint.startDate).toLocaleDateString()} - {new Date(sprint.endDate).toLocaleDateString()}
+											{convertDate(new Date(sprint.startDate).toLocaleDateString())} - {convertDate(new Date(sprint.endDate).toLocaleDateString())}
 										</div>
 									</div>
 
@@ -305,15 +351,15 @@ function ProjectDetails() {
 																{task.title}
 															</span>
 															<div className="ml-3">
-																{getPriorityBadge(task.priority)}
+																{getPriorityBadge(task.priorityLevel)}
 															</div>
 														</div>
 														<div className="flex items-center">
 															<div className="text-sm text-gray-400 mr-4">
-																{new Date(task.dueDate).toLocaleDateString()}
+																{convertDate(new Date(task.dueDate).toLocaleDateString())}
 															</div>
-															<div className={`w-6 h-6 rounded-full ${task.assignee === "JS" ? "bg-purple-700" : task.assignee === "AK" ? "bg-green-700" : "bg-pink-700"} flex items-center justify-center text-white text-xs font-medium`}>
-																{task.assignee}
+															<div className={`w-6 h-6 rounded-full ${["bg-purple-700", "bg-red-700", "bg-blue-700", "bg-green-700", "bg-yellow-700"][Math.floor(Math.random() * (5 - 0 + 1)) + 0]}  flex items-center justify-center text-white text-xs font-medium`}>
+																{getInitials(task.user.name)}
 															</div>
 														</div>
 													</div>
