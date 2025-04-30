@@ -103,119 +103,119 @@ const convertDate = (dateString) => {
 }
 
 const generateBurndownData = (sprints, project) => {
-  // Extract all tasks from all sprints
-  const allTasks = sprints.flatMap(sprint => sprint.tasks);
-  const totalTasks = allTasks.length;
-  
-  // Get completed tasks
-  const completedTasks = allTasks.filter(task => task.swimLane === "Done");
-  const completedTasksCount = completedTasks.length;
-  const remainingTasks = totalTasks - completedTasksCount;
+	// Extract all tasks from all sprints
+	const allTasks = sprints.flatMap(sprint => sprint.tasks);
+	const totalTasks = allTasks.length;
 
-  // Get dates for the project
-  const startDate = new Date(project.startDate);
-  const endDate = new Date(project.endDate);
-  const currentDate = new Date();
-  
-  // Calculate days since project start
-  const daysSinceStart = Math.max(1, Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24)));
-  
-  // Calculate velocity (completed tasks per day)
-  const currentVelocity = completedTasksCount / daysSinceStart;
-  
-  // Calculate estimated completion date
-  let estimatedCompletionDate;
-  if (currentVelocity > 0) {
-    // Days needed to complete remaining tasks at current velocity
-    const daysNeeded = Math.ceil(remainingTasks / currentVelocity);
-    estimatedCompletionDate = new Date(currentDate);
-    estimatedCompletionDate.setDate(currentDate.getDate() + daysNeeded);
-  } else {
-    // If no tasks completed yet, use the planned end date
-    estimatedCompletionDate = new Date(endDate);
-  }
-  
-  // Determine if the project is on track, ahead, or behind
-  let projectStatus = "on track";
-  if (estimatedCompletionDate < endDate) {
-    projectStatus = "ahead of schedule";
-  } else if (estimatedCompletionDate > endDate) {
-    projectStatus = "behind schedule";
-  }
+	// Get completed tasks
+	const completedTasks = allTasks.filter(task => task.swimLane === "Done");
+	const completedTasksCount = completedTasks.length;
+	const remainingTasks = totalTasks - completedTasksCount;
 
-  // Generate dates between project start and end (taking into account estimated end date if it's later)
-  const finalEndDate = estimatedCompletionDate > endDate ? estimatedCompletionDate : endDate;
-  const dateRange = [];
-  
-  // Create date range with 3-day intervals
-  for (let d = new Date(startDate); d <= finalEndDate; d.setDate(d.getDate() + 3)) {
-    dateRange.push(new Date(d));
-  }
+	// Get dates for the project
+	const startDate = new Date(project.startDate);
+	const endDate = new Date(project.endDate);
+	const currentDate = new Date();
 
-  // Ensure the final end date is included
-  if (dateRange[dateRange.length - 1].getTime() !== finalEndDate.getTime()) {
-    dateRange.push(new Date(finalEndDate));
-  }
+	// Calculate days since project start
+	const daysSinceStart = Math.max(1, Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24)));
 
-  // Calculate total project duration in days
-  const totalPlannedDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
-  
-  // Sort completed tasks by completion date to calculate historical velocity
-  const completedTasksDates = completedTasks
-    .filter(task => task.updatedAt) // Make sure we have a date
-    .map(task => new Date(task.updatedAt))
-    .sort((a, b) => a - b);
-  
-  // Generate burndown chart data
-  const data = dateRange.map((date, index) => {
-    const daysPassed = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
-    
-    // Calculate ideal remaining tasks based on planned duration
-    const idealRemaining = totalTasks - (totalTasks * (daysPassed / totalPlannedDays));
-    
-    // Calculate actual remaining tasks for dates up to current date
-    let actualRemaining;
-    if (date <= currentDate) {
-      // Count tasks completed before or on this date
-      const tasksCompletedByThisDate = completedTasksDates.filter(
-        completionDate => completionDate <= date
-      ).length;
-      
-      actualRemaining = totalTasks - tasksCompletedByThisDate;
-    } else {
-      // For future dates, project based on current velocity
-      const futureDaysPassed = Math.floor((date - currentDate) / (1000 * 60 * 60 * 24));
-      const projectedCompleted = completedTasksCount + (futureDaysPassed * currentVelocity);
-      actualRemaining = Math.max(0, totalTasks - Math.round(projectedCompleted));
-    }
+	// Calculate velocity (completed tasks per day)
+	const currentVelocity = completedTasksCount / daysSinceStart;
 
-    return {
-      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      ideal: Math.max(0, Math.round(idealRemaining)),
-      actual: Math.max(0, Math.round(actualRemaining)),
-      isPast: date <= currentDate
-    };
-  });
+	// Calculate estimated completion date
+	let estimatedCompletionDate;
+	if (currentVelocity > 0) {
+		// Days needed to complete remaining tasks at current velocity
+		const daysNeeded = Math.ceil(remainingTasks / currentVelocity);
+		estimatedCompletionDate = new Date(currentDate);
+		estimatedCompletionDate.setDate(currentDate.getDate() + daysNeeded);
+	} else {
+		// If no tasks completed yet, use the planned end date
+		estimatedCompletionDate = new Date(endDate);
+	}
 
-  // Return enhanced data structure with burndown chart data and analytics
-  return {
-    chartData: data,
-    analytics: {
-      totalTasks,
-      completedTasks: completedTasksCount,
-      remainingTasks,
-      currentVelocity: parseFloat(currentVelocity.toFixed(2)), // tasks per day
-      estimatedCompletionDate: estimatedCompletionDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }),
-      projectedDaysRemaining: Math.ceil((estimatedCompletionDate - currentDate) / (1000 * 60 * 60 * 24)),
-      daysElapsed: daysSinceStart,
-      plannedDuration: totalPlannedDays,
-      projectStatus
-    }
-  };
+	// Determine if the project is on track, ahead, or behind
+	let projectStatus = "on track";
+	if (estimatedCompletionDate < endDate) {
+		projectStatus = "ahead of schedule";
+	} else if (estimatedCompletionDate > endDate) {
+		projectStatus = "behind schedule";
+	}
+
+	// Generate dates between project start and end (taking into account estimated end date if it's later)
+	const finalEndDate = estimatedCompletionDate > endDate ? estimatedCompletionDate : endDate;
+	const dateRange = [];
+
+	// Create date range with 3-day intervals
+	for (let d = new Date(startDate); d <= finalEndDate; d.setDate(d.getDate() + 3)) {
+		dateRange.push(new Date(d));
+	}
+
+	// Ensure the final end date is included
+	if (dateRange[dateRange.length - 1].getTime() !== finalEndDate.getTime()) {
+		dateRange.push(new Date(finalEndDate));
+	}
+
+	// Calculate total project duration in days
+	const totalPlannedDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+
+	// Sort completed tasks by completion date to calculate historical velocity
+	const completedTasksDates = completedTasks
+		.filter(task => task.updatedAt) // Make sure we have a date
+		.map(task => new Date(task.updatedAt))
+		.sort((a, b) => a - b);
+
+	// Generate burndown chart data
+	const data = dateRange.map((date, index) => {
+		const daysPassed = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+
+		// Calculate ideal remaining tasks based on planned duration
+		const idealRemaining = totalTasks - (totalTasks * (daysPassed / totalPlannedDays));
+
+		// Calculate actual remaining tasks for dates up to current date
+		let actualRemaining;
+		if (date <= currentDate) {
+			// Count tasks completed before or on this date
+			const tasksCompletedByThisDate = completedTasksDates.filter(
+				completionDate => completionDate <= date
+			).length;
+
+			actualRemaining = totalTasks - tasksCompletedByThisDate;
+		} else {
+			// For future dates, project based on current velocity
+			const futureDaysPassed = Math.floor((date - currentDate) / (1000 * 60 * 60 * 24));
+			const projectedCompleted = completedTasksCount + (futureDaysPassed * currentVelocity);
+			actualRemaining = Math.max(0, totalTasks - Math.round(projectedCompleted));
+		}
+
+		return {
+			date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+			ideal: Math.max(0, Math.round(idealRemaining)),
+			actual: Math.max(0, Math.round(actualRemaining)),
+			isPast: date <= currentDate
+		};
+	});
+
+	// Return enhanced data structure with burndown chart data and analytics
+	return {
+		chartData: data,
+		analytics: {
+			totalTasks,
+			completedTasks: completedTasksCount,
+			remainingTasks,
+			currentVelocity: parseFloat(currentVelocity.toFixed(2)), // tasks per day
+			estimatedCompletionDate: estimatedCompletionDate.toLocaleDateString('en-US', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			}),
+			projectedDaysRemaining: Math.ceil((estimatedCompletionDate - currentDate) / (1000 * 60 * 60 * 24)),
+			daysElapsed: daysSinceStart,
+			plannedDuration: totalPlannedDays,
+			projectStatus
+		}
+	};
 };
 
 function ProjectDetails() {
@@ -229,6 +229,7 @@ function ProjectDetails() {
 	const [newUsername, setNewUsername] = useState('');
 	const [showAddNoteModal, setShowAddNoteModal] = useState(false);
 	const [showAddSprintModal, setShowAddSprintModal] = useState(false);
+	const [addCollaboratorError, setAddCollaboratorError] = useState('');
 	const [newSprint, setNewSprint] = useState({
 		title: '',
 		startDate: new Date().toISOString().split('T')[0],
@@ -241,7 +242,7 @@ function ProjectDetails() {
 			const response = await axios.get(`${apiUrl}/sprints/project/${projectid}`);
 			setSprints(response.data.sprints);
 			console.log("Sprints: ", response.data.sprints);
-			
+
 		} catch (error) {
 			console.error("Error fetching sprints:", error);
 		}
@@ -251,7 +252,7 @@ function ProjectDetails() {
 			const response = await axios.get(`${apiUrl}/projects/${projectid}`);
 			setProject(response.data.project);
 			console.log("Project: ", response.data.project);
-			
+
 		} catch (error) {
 			console.error("Error fetching project:", error);
 		}
@@ -277,10 +278,21 @@ function ProjectDetails() {
 		setShowAddSprintModal(false);
 	}
 
+	const inviteUser = async () => {
+		try {
+			await axios.post(`${apiUrl}/collaborators/project/${projectid}`, { username: newUsername });
+			await getProjectData(); // Refresh project data after inviting user
+			setNewUsername('');
+			setShowInviteModal(false);
+		} catch (error) {
+			console.error("Error inviting user:", error);
+			setAddCollaboratorError(error.response.data.message);
+		}
+	}
 
 
 	useEffect(() => {
-		
+
 
 		const initializeData = async () => {
 			await getSprintData();
@@ -312,14 +324,13 @@ function ProjectDetails() {
 		await createSprint();
 	};
 
-	const handleInviteUser = (e) => {
+	const handleInviteUser = async (e) => {
 		e.preventDefault();
 		if (!newUsername.trim()) return;
 
 		// In a real app, you would call an API to invite the user
-		console.log(`Inviting user: ${newUsername}`);
-		setNewUsername('');
-		setShowInviteModal(false);
+		await inviteUser(newUsername);
+
 	};
 
 	const handleAddNote = (e) => {
@@ -372,7 +383,7 @@ function ProjectDetails() {
 
 	const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-	
+
 
 	if (loading) {
 		return <div className="text-white w-full h-full flex items-center justify-center">Loading...</div>;
@@ -707,21 +718,37 @@ function ProjectDetails() {
 							<h3 className="text-xl font-semibold text-white">Invite Team Member</h3>
 							<button
 								className="text-gray-400 hover:text-white"
-								onClick={() => setShowInviteModal(false)}
+								onClick={() => {
+									setShowInviteModal(false);
+									setAddCollaboratorError(''); // Clear error when closing modal
+								}}
 							>
 								<X size={20} />
 							</button>
 						</div>
 
 						<form onSubmit={handleInviteUser}>
+							{/* Add error message display here */}
+							{addCollaboratorError && (
+								<div className="mb-4 p-3 bg-red-900/50 border border-red-700 text-red-200 rounded-lg text-sm">
+									{addCollaboratorError}
+								</div>
+							)}
+
 							<div className="mb-4">
 								<label className="block text-gray-300 mb-2 text-sm">Username</label>
 								<input
 									type="text"
 									value={newUsername}
-									onChange={(e) => setNewUsername(e.target.value)}
+									onChange={(e) => {
+										setNewUsername(e.target.value);
+										// Clear error when user starts typing
+										if (addCollaboratorError) {
+											setAddCollaboratorError('');
+										}
+									}}
 									placeholder="Enter username"
-									className="w-full p-3 bg-[#1c1c1c] border border-[#444] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+									className={`w-full p-3 bg-[#1c1c1c] border ${addCollaboratorError ? 'border-red-500' : 'border-[#444]'} rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
 									required
 								/>
 							</div>
@@ -730,13 +757,17 @@ function ProjectDetails() {
 								<button
 									type="button"
 									className="px-4 py-2 bg-transparent border border-[#444] text-gray-300 rounded-lg hover:bg-[#333]"
-									onClick={() => setShowInviteModal(false)}
+									onClick={() => {
+										setShowInviteModal(false);
+										setAddCollaboratorError(''); // Clear error when canceling
+									}}
 								>
 									Cancel
 								</button>
 								<button
 									type="submit"
-									className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+									className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+									disabled={!newUsername.trim()} // Disable if no username entered
 								>
 									Invite
 								</button>

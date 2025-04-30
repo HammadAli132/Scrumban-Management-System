@@ -51,6 +51,11 @@ const collaboratorController = {
           success: false,
           message: "User is already a collaborator on this project",
         });
+      } else if (error.message === 'User is the project owner and cannot be added as a collaborator') {
+        return res.status(403).json({
+          success: false,
+          message: "User is the project owner and cannot be added as a collaborator",
+        });
       }
       
       return res.status(500).json({
