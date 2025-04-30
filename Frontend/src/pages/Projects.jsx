@@ -41,23 +41,7 @@ const dummyProjects = [
 
 function ProjectDetails() {
   const { projectid } = useParams();
-  const projectId = parseInt(projectid || '1', 10);
-  
-  // Find the project from our dummy data
-  const project = dummyProjects.find(p => p.id === projectId);
-  
-  if (!project) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl text-white font-semibold">Project not found</h2>
-          <Link to="/" className="mt-4 inline-flex items-center text-blue-500 hover:text-blue-400">
-            <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const project = dummyProjects[0];
   
   return (
     <div className="px-4 py-6 md:px-6 lg:px-8">
