@@ -102,47 +102,120 @@ const convertDate = (dateString) => {
 	return date.toLocaleDateString('en-US', options)
 }
 
-// Generate burndown chart data
-const generateBurndownData = (sprints) => {
-	const allTasks = sprints.flatMap(sprint => sprint.tasks);
-	const totalTasks = allTasks.length;
-	const completedTasks = allTasks.filter(task => task.swimLane === "Done").length;
-	const remainingTasks = totalTasks - completedTasks;
+const generateBurndownData = (sprints, project) => {
+  // Extract all tasks from all sprints
+  const allTasks = sprints.flatMap(sprint => sprint.tasks);
+  const totalTasks = allTasks.length;
+  
+  // Get completed tasks
+  const completedTasks = allTasks.filter(task => task.swimLane === "Done");
+  const completedTasksCount = completedTasks.length;
+  const remainingTasks = totalTasks - completedTasksCount;
 
-	// Generate dates between project start and end
-	const startDate = new Date(dummyProject.startDate);
-	const endDate = new Date(dummyProject.endDate);
-	const dateRange = [];
-	const currentDate = new Date();
+  // Get dates for the project
+  const startDate = new Date(project.startDate);
+  const endDate = new Date(project.endDate);
+  const currentDate = new Date();
+  
+  // Calculate days since project start
+  const daysSinceStart = Math.max(1, Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24)));
+  
+  // Calculate velocity (completed tasks per day)
+  const currentVelocity = completedTasksCount / daysSinceStart;
+  
+  // Calculate estimated completion date
+  let estimatedCompletionDate;
+  if (currentVelocity > 0) {
+    // Days needed to complete remaining tasks at current velocity
+    const daysNeeded = Math.ceil(remainingTasks / currentVelocity);
+    estimatedCompletionDate = new Date(currentDate);
+    estimatedCompletionDate.setDate(currentDate.getDate() + daysNeeded);
+  } else {
+    // If no tasks completed yet, use the planned end date
+    estimatedCompletionDate = new Date(endDate);
+  }
+  
+  // Determine if the project is on track, ahead, or behind
+  let projectStatus = "on track";
+  if (estimatedCompletionDate < endDate) {
+    projectStatus = "ahead of schedule";
+  } else if (estimatedCompletionDate > endDate) {
+    projectStatus = "behind schedule";
+  }
 
-	for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 3)) {
-		dateRange.push(new Date(d));
-	}
+  // Generate dates between project start and end (taking into account estimated end date if it's later)
+  const finalEndDate = estimatedCompletionDate > endDate ? estimatedCompletionDate : endDate;
+  const dateRange = [];
+  
+  // Create date range with 3-day intervals
+  for (let d = new Date(startDate); d <= finalEndDate; d.setDate(d.getDate() + 3)) {
+    dateRange.push(new Date(d));
+  }
 
-	// Calculate ideal burndown
-	const data = dateRange.map((date, index) => {
-		const daysPassed = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
-		const totalDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
-		const idealRemaining = totalTasks - (totalTasks * (daysPassed / totalDays));
+  // Ensure the final end date is included
+  if (dateRange[dateRange.length - 1].getTime() !== finalEndDate.getTime()) {
+    dateRange.push(new Date(finalEndDate));
+  }
 
-		// Calculate actual remaining (random data for demonstration)
-		let actualRemaining;
-		if (date <= currentDate) {
-			const randomFactor = Math.random() * 0.2 + 0.9; // 0.9 to 1.1
-			actualRemaining = Math.max(0, Math.floor(idealRemaining * randomFactor));
-		} else {
-			actualRemaining = remainingTasks;
-		}
+  // Calculate total project duration in days
+  const totalPlannedDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+  
+  // Sort completed tasks by completion date to calculate historical velocity
+  const completedTasksDates = completedTasks
+    .filter(task => task.updatedAt) // Make sure we have a date
+    .map(task => new Date(task.updatedAt))
+    .sort((a, b) => a - b);
+  
+  // Generate burndown chart data
+  const data = dateRange.map((date, index) => {
+    const daysPassed = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+    
+    // Calculate ideal remaining tasks based on planned duration
+    const idealRemaining = totalTasks - (totalTasks * (daysPassed / totalPlannedDays));
+    
+    // Calculate actual remaining tasks for dates up to current date
+    let actualRemaining;
+    if (date <= currentDate) {
+      // Count tasks completed before or on this date
+      const tasksCompletedByThisDate = completedTasksDates.filter(
+        completionDate => completionDate <= date
+      ).length;
+      
+      actualRemaining = totalTasks - tasksCompletedByThisDate;
+    } else {
+      // For future dates, project based on current velocity
+      const futureDaysPassed = Math.floor((date - currentDate) / (1000 * 60 * 60 * 24));
+      const projectedCompleted = completedTasksCount + (futureDaysPassed * currentVelocity);
+      actualRemaining = Math.max(0, totalTasks - Math.round(projectedCompleted));
+    }
 
-		return {
-			date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-			ideal: Math.max(0, Math.round(idealRemaining)),
-			actual: actualRemaining,
-			isPast: date <= currentDate
-		};
-	});
+    return {
+      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      ideal: Math.max(0, Math.round(idealRemaining)),
+      actual: Math.max(0, Math.round(actualRemaining)),
+      isPast: date <= currentDate
+    };
+  });
 
-	return data;
+  // Return enhanced data structure with burndown chart data and analytics
+  return {
+    chartData: data,
+    analytics: {
+      totalTasks,
+      completedTasks: completedTasksCount,
+      remainingTasks,
+      currentVelocity: parseFloat(currentVelocity.toFixed(2)), // tasks per day
+      estimatedCompletionDate: estimatedCompletionDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }),
+      projectedDaysRemaining: Math.ceil((estimatedCompletionDate - currentDate) / (1000 * 60 * 60 * 24)),
+      daysElapsed: daysSinceStart,
+      plannedDuration: totalPlannedDays,
+      projectStatus
+    }
+  };
 };
 
 function ProjectDetails() {
@@ -151,7 +224,7 @@ function ProjectDetails() {
 	const [project, setProject] = useState(dummyProject);
 	const [sprints, setSprints] = useState(dummySprints);
 	const [meetingNotes, setMeetingNotes] = useState(dummyMeetingNotes);
-	const [burndownData, setBurndownData] = useState([]);
+	const [burndownData, setBurndownData] = useState({});
 	const [showInviteModal, setShowInviteModal] = useState(false);
 	const [newUsername, setNewUsername] = useState('');
 	const [showAddNoteModal, setShowAddNoteModal] = useState(false);
@@ -163,28 +236,51 @@ function ProjectDetails() {
 	});
 	const [newNote, setNewNote] = useState({ title: '', content: '' });
 
+	const getSprintData = async () => {
+		try {
+			const response = await axios.get(`${apiUrl}/sprints/project/${projectid}`);
+			setSprints(response.data.sprints);
+			console.log("Sprints: ", response.data.sprints);
+			
+		} catch (error) {
+			console.error("Error fetching sprints:", error);
+		}
+	}
+	const getProjectData = async () => {
+		try {
+			const response = await axios.get(`${apiUrl}/projects/${projectid}`);
+			setProject(response.data.project);
+			console.log("Project: ", response.data.project);
+			
+		} catch (error) {
+			console.error("Error fetching project:", error);
+		}
+	}
+
+	const createSprint = async () => {
+		if (!newSprint.title.trim() || !newSprint.endDate) return;
+
+		// In a real app, you would call an API to add the sprint
+		const sprintToAdd = {
+			title: newSprint.title,
+			startDate: newSprint.startDate,
+			endDate: newSprint.endDate,
+		};
+
+		try {
+			await axios.post(`${apiUrl}/sprints/project/${projectid}`, sprintToAdd);
+			await getSprintData(); // Refresh sprint data after adding
+		} catch (error) {
+			console.error("Error adding sprint:", error);
+		}
+
+		setShowAddSprintModal(false);
+	}
+
+
+
 	useEffect(() => {
-		// In a real app, you would fetch project, sprints, and other data here
-		const getSprintData = async () => {
-			try {
-				const response = await axios.get(`${apiUrl}/sprints/project/${projectid}`);
-				setSprints(response.data.sprints);
-				console.log("Sprints: ", response.data.sprints);
-				
-			} catch (error) {
-				console.error("Error fetching sprints:", error);
-			}
-		}
-		const getProjectData = async () => {
-			try {
-				const response = await axios.get(`${apiUrl}/projects/${projectid}`);
-				setProject(response.data.project);
-				console.log("Project: ", response.data.project);
-				
-			} catch (error) {
-				console.error("Error fetching project:", error);
-			}
-		}
+		
 
 		const initializeData = async () => {
 			await getSprintData();
@@ -196,9 +292,11 @@ function ProjectDetails() {
 	}, []);
 
 	useEffect(() => {
-		setBurndownData(generateBurndownData(sprints));
+		if (!loading) {
+			setBurndownData(generateBurndownData(sprints, { startDate: project.project.startDate, endDate: project.project.endDate }));
 
-	}, [sprints])
+		}
+	}, [sprints, loading])
 
 	const toggleSprintExpand = (sprintId) => {
 		setSprints(sprints.map(sprint =>
@@ -209,27 +307,9 @@ function ProjectDetails() {
 	};
 
 	// Add this handler function
-	const handleAddSprint = (e) => {
+	const handleAddSprint = async (e) => {
 		e.preventDefault();
-		if (!newSprint.title.trim() || !newSprint.endDate) return;
-
-		// In a real app, you would call an API to add the sprint
-		const sprintToAdd = {
-			id: sprints.length + 1,
-			title: newSprint.title,
-			startDate: newSprint.startDate,
-			endDate: newSprint.endDate,
-			isExpanded: false,
-			tasks: []
-		};
-
-		setSprints([...sprints, sprintToAdd]);
-		setNewSprint({
-			title: '',
-			startDate: new Date().toISOString().split('T')[0],
-			endDate: ''
-		});
-		setShowAddSprintModal(false);
+		await createSprint();
 	};
 
 	const handleInviteUser = (e) => {
@@ -290,6 +370,10 @@ function ProjectDetails() {
 	const completedTasks = sprints.reduce((acc, sprint) =>
 		acc + sprint.tasks.filter(task => task.swimLane === 'Done').length, 0);
 
+	const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+	
+
 	if (loading) {
 		return <div className="text-white w-full h-full flex items-center justify-center">Loading...</div>;
 	}
@@ -344,7 +428,7 @@ function ProjectDetails() {
 										<div className="p-4 bg-[#1c1c1c]">
 											<div className="space-y-3">
 												{sprint.tasks.map(task => (
-													<div key={task.id} className="flex items-center justify-between bg-[#252525] p-3 rounded-lg">
+													<div key={task._id} className="flex items-center justify-between bg-[#252525] p-3 rounded-lg">
 														<div className="flex items-center">
 															{getStatusIcon(task.swimLane)}
 															<span className="ml-3 text-white">
@@ -365,9 +449,6 @@ function ProjectDetails() {
 													</div>
 												))}
 											</div>
-											<button className="mt-4 py-2 w-full border border-dashed border-[#444] text-gray-400 hover:text-gray-300 rounded-lg transition-colors text-sm flex items-center justify-center">
-												<PlusCircle size={14} className="mr-2" /> Add Task
-											</button>
 										</div>
 									)}
 								</div>
@@ -381,7 +462,7 @@ function ProjectDetails() {
 
 						<div className="h-80">
 							<ResponsiveContainer width="100%" height="100%">
-								<LineChart data={burndownData} margin={{ top: 5, right: 20, bottom: 25, left: 10 }}>
+								<LineChart data={burndownData.chartData} margin={{ top: 5, right: 20, bottom: 25, left: 10 }}>
 									<CartesianGrid strokeDasharray="3 3" stroke="#333" />
 									<XAxis
 										dataKey="date"
@@ -425,11 +506,11 @@ function ProjectDetails() {
 						<div className="mt-4 p-3 bg-[#252525] rounded-lg text-sm text-gray-300">
 							<div className="flex items-center mb-1">
 								<AlertCircle size={14} className="text-yellow-500 mr-2" />
-								<span>Current velocity: <span className="text-white font-medium">3.5 tasks/day</span></span>
+								<span>Current velocity: <span className="text-white font-medium">{burndownData.analytics ? burndownData.analytics.currentVelocity : ""} tasks/day</span></span>
 							</div>
 							<div className="flex items-center">
 								<Flag size={14} className="text-blue-500 mr-2" />
-								<span>Projected completion: <span className="text-white font-medium">Dec 12, 2023</span> (3 days early)</span>
+								<span>Projected completion: <span className="text-white font-medium">{burndownData.analytics ? burndownData.analytics.estimatedCompletionDate : ""}</span></span>
 							</div>
 						</div>
 					</div>
@@ -456,7 +537,7 @@ function ProjectDetails() {
 									<circle
 										className="text-blue-600"
 										strokeWidth="10"
-										strokeDasharray={`${(completedTasks / totalTasks * 100) * 2.51} 251.2`}
+										strokeDasharray={`${progress * 2.51} 251.2`}
 										strokeLinecap="round"
 										stroke="currentColor"
 										fill="transparent"
@@ -466,7 +547,7 @@ function ProjectDetails() {
 									/>
 								</svg>
 								<div className="absolute inset-0 flex items-center justify-center">
-									<span className="text-3xl font-bold text-white">{Math.round(completedTasks / totalTasks * 100)}%</span>
+									<span className="text-3xl font-bold text-white">{progress}%</span>
 								</div>
 							</div>
 
@@ -481,16 +562,10 @@ function ProjectDetails() {
 								<div className="flex items-center mb-2">
 									<Calendar size={16} className="text-blue-500 mr-2" />
 									<span className="text-white">
-										Due on {new Date(project.endDate).toLocaleDateString()}
+										Due on {convertDate(new Date(project.project.endDate).toLocaleDateString())}
 									</span>
 								</div>
 
-								<div className="flex items-center">
-									<Clock size={16} className="text-yellow-500 mr-2" />
-									<span className="text-white">
-										Updated {project.lastUpdated}
-									</span>
-								</div>
 							</div>
 						</div>
 					</div>
@@ -502,10 +577,10 @@ function ProjectDetails() {
 						<div className="flex -space-x-2 mb-4">
 							{project.collaborators.map(collaborator => (
 								<div
-									key={collaborator.id}
-									className={`w-10 h-10 rounded-full border-2 border-[#1c1c1c] ${collaborator.color} flex items-center justify-center text-white font-medium`}
+									key={collaborator._id}
+									className={`w-10 h-10 rounded-full border-2 border-[#1c1c1c] ${["bg-purple-700", "bg-red-700", "bg-blue-700", "bg-green-700", "bg-yellow-700"][Math.floor(Math.random() * (5 - 0 + 1)) + 0]} flex items-center justify-center text-white font-medium`}
 								>
-									{collaborator.initials}
+									{getInitials(collaborator.userId.name)}
 								</div>
 							))}
 						</div>
@@ -532,19 +607,14 @@ function ProjectDetails() {
 						</div>
 
 						<div className="space-y-4">
-							{meetingNotes.map(note => (
-								<div key={note.id} className="bg-[#252525] p-4 rounded-lg">
+							{project.meetingNotes.map(note => (
+								<div key={note._id} className="bg-[#252525] p-4 rounded-lg">
 									<div className="flex items-center justify-between mb-2">
 										<h3 className="font-medium text-white">{note.title}</h3>
-										<div className="text-xs text-gray-400">{note.createdAt}</div>
+										<div className="text-xs text-gray-400">{convertDate(note.createdAt.split("T")[0])}</div>
 									</div>
 									<p className="text-gray-300 text-sm mb-3">{note.content}</p>
-									<div className="flex items-center text-xs text-gray-400">
-										<div className={`w-5 h-5 rounded-full ${note.createdBy === "JS" ? "bg-purple-700" : note.createdBy === "AK" ? "bg-green-700" : "bg-pink-700"} flex items-center justify-center text-white font-medium mr-2`}>
-											{note.createdBy}
-										</div>
-										<span>Added by {note.createdBy}</span>
-									</div>
+
 								</div>
 							))}
 						</div>
