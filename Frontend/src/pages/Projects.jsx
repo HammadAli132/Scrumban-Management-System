@@ -1,66 +1,226 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock, Users, CheckSquare, MessageSquare } from 'lucide-react';
+import { 
+  ArrowLeft, Calendar, Clock, Users, CheckSquare, 
+  PlusCircle, ChevronRight, ChevronDown, AlertCircle, 
+  Flag, BarChart2, CheckCircle, Circle, X
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
+  ResponsiveContainer, Legend
+} from 'recharts';
 
 // This would normally come from your API or state management
-const dummyProjects = [
-  { 
-    id: 1, 
-    name: "Analytics Dashboard", 
-    description: "Data visualization platform for marketing metrics", 
-    progress: 75,
-    isOwned: true,
-    collaborators: 3,
-    dueDate: "2023-12-15",
+const dummyProject = {
+  id: 1, 
+  name: "Analytics Dashboard", 
+  description: "Data visualization platform for marketing metrics", 
+  progress: 75,
+  isOwned: true,
+  collaborators: [
+    { id: 1, username: "johnsmith", initials: "JS", color: "bg-purple-700" },
+    { id: 2, username: "alexkim", initials: "AK", color: "bg-green-700" },
+    { id: 3, username: "lisamoore", initials: "LM", color: "bg-pink-700" }
+  ],
+  startDate: "2023-11-01",
+  endDate: "2023-12-15",
+  lastUpdated: "2 hours ago"
+};
+
+const dummySprints = [
+  {
+    id: 1,
+    title: "Sprint 1: Foundation",
+    startDate: "2023-11-01",
+    endDate: "2023-11-14",
+    isExpanded: true,
     tasks: [
-      { id: 1, title: "Design mockups", completed: true },
-      { id: 2, title: "Set up API routes", completed: true },
-      { id: 3, title: "Implement data visualization", completed: false },
-      { id: 4, title: "Add filter functionality", completed: false },
-      { id: 5, title: "Test with real data", completed: false },
+      { id: 1, title: "Design mockups", priority: "high", swimLane: "Done", dueDate: "2023-11-05", assignee: "JS" },
+      { id: 2, title: "Set up API routes", priority: "medium", swimLane: "Done", dueDate: "2023-11-10", assignee: "AK" },
+      { id: 3, title: "Create database schema", priority: "high", swimLane: "Done", dueDate: "2023-11-14", assignee: "LM" },
+      { id: 4, title: "Setup project environment", priority: "medium", swimLane: "Done", dueDate: "2023-11-03", assignee: "JS" }
     ]
   },
-  { 
-    id: 2, 
-    name: "Mobile App Redesign", 
-    description: "UX/UI improvements for the mobile experience", 
-    progress: 40,
-    isOwned: false,
-    collaborators: 5,
-    dueDate: "2023-11-30",
+  {
+    id: 2,
+    title: "Sprint 2: Core Features",
+    startDate: "2023-11-15",
+    endDate: "2023-11-28",
+    isExpanded: false,
     tasks: [
-      { id: 1, title: "Review current UI issues", completed: true },
-      { id: 2, title: "Create wireframes", completed: true },
-      { id: 3, title: "Design new components", completed: false },
-      { id: 4, title: "Usability testing", completed: false },
+      { id: 5, title: "Implement data visualization", priority: "high", swimLane: "Doing", dueDate: "2023-11-20", assignee: "AK" },
+      { id: 6, title: "Add filter functionality", priority: "medium", swimLane: "Doing", dueDate: "2023-11-25", assignee: "JS" },
+      { id: 7, title: "Create user dashboard", priority: "high", swimLane: "ToDo", dueDate: "2023-11-28", assignee: "LM" },
+      { id: 8, title: "Implement authentication", priority: "high", swimLane: "Doing", dueDate: "2023-11-22", assignee: "JS" }
     ]
   },
-  // Other projects would be defined here
+  {
+    id: 3,
+    title: "Sprint 3: Final Touches",
+    startDate: "2023-11-29",
+    endDate: "2023-12-15",
+    isExpanded: false,
+    tasks: [
+      { id: 9, title: "Test with real data", priority: "medium", swimLane: "ToDo", dueDate: "2023-12-05", assignee: "AK" },
+      { id: 10, title: "Performance optimization", priority: "low", swimLane: "ToDo", dueDate: "2023-12-10", assignee: "JS" },
+      { id: 11, title: "Documentation", priority: "medium", swimLane: "ToDo", dueDate: "2023-12-15", assignee: "LM" }
+    ]
+  }
 ];
+
+const dummyMeetingNotes = [
+  {
+    id: 1,
+    title: "Sprint 1 Planning",
+    content: "Outlined key objectives for the first sprint. Assigned tasks to team members. Discussed potential blockers.",
+    createdAt: "2023-11-01",
+    createdBy: "JS"
+  },
+  {
+    id: 2,
+    title: "Weekly Check-in",
+    content: "API routes are coming along well. Design mockups need feedback. Database schema is complete.",
+    createdAt: "2023-11-08",
+    createdBy: "AK"
+  },
+  {
+    id: 3,
+    title: "Sprint 1 Review",
+    content: "Completed all tasks for Sprint 1. Ready to move to Sprint 2. Need to focus on data visualization components.",
+    createdAt: "2023-11-14",
+    createdBy: "LM"
+  }
+];
+
+// Generate burndown chart data
+const generateBurndownData = (sprints) => {
+  const allTasks = sprints.flatMap(sprint => sprint.tasks);
+  const totalTasks = allTasks.length;
+  const completedTasks = allTasks.filter(task => task.swimLane === "Done").length;
+  const remainingTasks = totalTasks - completedTasks;
+  
+  // Generate dates between project start and end
+  const startDate = new Date(dummyProject.startDate);
+  const endDate = new Date(dummyProject.endDate);
+  const dateRange = [];
+  const currentDate = new Date();
+  
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 3)) {
+    dateRange.push(new Date(d));
+  }
+  
+  // Calculate ideal burndown
+  const data = dateRange.map((date, index) => {
+    const daysPassed = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+    const totalDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const idealRemaining = totalTasks - (totalTasks * (daysPassed / totalDays));
+    
+    // Calculate actual remaining (random data for demonstration)
+    let actualRemaining;
+    if (date <= currentDate) {
+      const randomFactor = Math.random() * 0.2 + 0.9; // 0.9 to 1.1
+      actualRemaining = Math.max(0, Math.floor(idealRemaining * randomFactor));
+    } else {
+      actualRemaining = remainingTasks;
+    }
+    
+    return {
+      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      ideal: Math.max(0, Math.round(idealRemaining)),
+      actual: actualRemaining,
+      isPast: date <= currentDate
+    };
+  });
+  
+  return data;
+};
 
 function ProjectDetails() {
   const { projectid } = useParams();
-  const projectId = parseInt(projectid || '1', 10);
+  const [project, setProject] = useState(dummyProject);
+  const [sprints, setSprints] = useState(dummySprints);
+  const [meetingNotes, setMeetingNotes] = useState(dummyMeetingNotes);
+  const [burndownData, setBurndownData] = useState([]);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [showAddNoteModal, setShowAddNoteModal] = useState(false);
+  const [newNote, setNewNote] = useState({ title: '', content: '' });
   
-  // Find the project from our dummy data
-  const project = dummyProjects.find(p => p.id === projectId);
+  useEffect(() => {
+    // In a real app, you would fetch project, sprints, and other data here
+    setBurndownData(generateBurndownData(sprints));
+  }, [sprints]);
   
-  if (!project) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl text-white font-semibold">Project not found</h2>
-          <Link to="/" className="mt-4 inline-flex items-center text-blue-500 hover:text-blue-400">
-            <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const toggleSprintExpand = (sprintId) => {
+    setSprints(sprints.map(sprint => 
+      sprint.id === sprintId 
+        ? { ...sprint, isExpanded: !sprint.isExpanded } 
+        : sprint
+    ));
+  };
+  
+  const handleInviteUser = (e) => {
+    e.preventDefault();
+    if (!newUsername.trim()) return;
+    
+    // In a real app, you would call an API to invite the user
+    console.log(`Inviting user: ${newUsername}`);
+    setNewUsername('');
+    setShowInviteModal(false);
+  };
+  
+  const handleAddNote = (e) => {
+    e.preventDefault();
+    if (!newNote.title.trim() || !newNote.content.trim()) return;
+    
+    // In a real app, you would call an API to add the note
+    const newNoteWithId = {
+      id: meetingNotes.length + 1,
+      ...newNote,
+      createdAt: new Date().toISOString().split('T')[0],
+      createdBy: "JS" // Current user
+    };
+    
+    setMeetingNotes([newNoteWithId, ...meetingNotes]);
+    setNewNote({ title: '', content: '' });
+    setShowAddNoteModal(false);
+  };
+  
+  const getPriorityBadge = (priority) => {
+    switch(priority) {
+      case 'high':
+        return <span className="px-2 py-0.5 bg-red-500/20 text-red-400 rounded text-xs font-medium">High</span>;
+      case 'medium':
+        return <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-xs font-medium">Medium</span>;
+      case 'low':
+        return <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-medium">Low</span>;
+      default:
+        return null;
+    }
+  };
+  
+  const getStatusIcon = (swimLane) => {
+    switch(swimLane) {
+      case 'Done':
+        return <CheckCircle size={16} className="text-green-500" />;
+      case 'Doing':
+        return <Circle size={16} className="text-blue-500" />;
+      case 'ToDo':
+        return <Circle size={16} className="text-gray-500" />;
+      default:
+        return null;
+    }
+  };
+  
+  // Calculate total completed tasks
+  const totalTasks = sprints.reduce((acc, sprint) => acc + sprint.tasks.length, 0);
+  const completedTasks = sprints.reduce((acc, sprint) => 
+    acc + sprint.tasks.filter(task => task.swimLane === 'Done').length, 0);
   
   return (
     <div className="px-4 py-6 md:px-6 lg:px-8">
+      {/* Header Section */}
       <div className="mb-6">
         <Link to="/dashboard" className="inline-flex items-center text-blue-500 hover:text-blue-400 mb-4">
           <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
@@ -69,83 +229,136 @@ function ProjectDetails() {
         <p className="text-gray-400 mt-2">{project.description}</p>
       </div>
       
+      {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column (Sprints and Burndown) */}
         <div className="lg:col-span-2">
+          {/* Sprints Section */}
           <div className="bg-[#1c1c1c] rounded-xl p-6 shadow-lg mb-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Tasks</h2>
+              <h2 className="text-xl font-semibold text-white">Sprints</h2>
               <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm">
-                Add Task
+                Add Sprint
               </button>
             </div>
             
-            <div className="space-y-3">
-              {project.tasks.map(task => (
-                <div key={task.id} className="flex items-center bg-[#252525] p-4 rounded-lg">
-                  <input 
-                    type="checkbox" 
-                    checked={task.completed} 
-                    readOnly
-                    className="h-5 w-5 text-blue-600 rounded border-gray-500 focus:ring-blue-500"
-                  />
-                  <span className={`ml-3 ${task.completed ? 'text-gray-500 line-through' : 'text-white'}`}>
-                    {task.title}
-                  </span>
+            <div className="space-y-4">
+              {sprints.map(sprint => (
+                <div key={sprint.id} className="border border-[#333] rounded-lg overflow-hidden">
+                  <div 
+                    className="flex items-center justify-between p-4 bg-[#252525] cursor-pointer"
+                    onClick={() => toggleSprintExpand(sprint.id)}
+                  >
+                    <div className="flex items-center">
+                      {sprint.isExpanded ? 
+                        <ChevronDown size={18} className="text-gray-400 mr-2" /> : 
+                        <ChevronRight size={18} className="text-gray-400 mr-2" />
+                      }
+                      <h3 className="font-medium text-white">{sprint.title}</h3>
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      {new Date(sprint.startDate).toLocaleDateString()} - {new Date(sprint.endDate).toLocaleDateString()}
+                    </div>
+                  </div>
+                  
+                  {sprint.isExpanded && (
+                    <div className="p-4 bg-[#1c1c1c]">
+                      <div className="space-y-3">
+                        {sprint.tasks.map(task => (
+                          <div key={task.id} className="flex items-center justify-between bg-[#252525] p-3 rounded-lg">
+                            <div className="flex items-center">
+                              {getStatusIcon(task.swimLane)}
+                              <span className="ml-3 text-white">
+                                {task.title}
+                              </span>
+                              <div className="ml-3">
+                                {getPriorityBadge(task.priority)}
+                              </div>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="text-sm text-gray-400 mr-4">
+                                {new Date(task.dueDate).toLocaleDateString()}
+                              </div>
+                              <div className={`w-6 h-6 rounded-full ${task.assignee === "JS" ? "bg-purple-700" : task.assignee === "AK" ? "bg-green-700" : "bg-pink-700"} flex items-center justify-center text-white text-xs font-medium`}>
+                                {task.assignee}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <button className="mt-4 py-2 w-full border border-dashed border-[#444] text-gray-400 hover:text-gray-300 rounded-lg transition-colors text-sm flex items-center justify-center">
+                        <PlusCircle size={14} className="mr-2" /> Add Task
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
           
+          {/* Burndown Chart */}
           <div className="bg-[#1c1c1c] rounded-xl p-6 shadow-lg">
-            <h2 className="text-xl font-semibold text-white mb-6">Activity</h2>
+            <h2 className="text-xl font-semibold text-white mb-6">Burndown Chart</h2>
             
-            <div className="space-y-4">
-              <div className="flex">
-                <div className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white font-medium flex-shrink-0">
-                  JS
-                </div>
-                <div className="ml-4">
-                  <p className="text-white">
-                    <span className="font-medium">John Smith</span>
-                    <span className="text-gray-400"> added a new task: </span>
-                    <span className="text-blue-400">Test with real data</span>
-                  </p>
-                  <p className="text-gray-500 text-sm mt-1">2 hours ago</p>
-                </div>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={burndownData} margin={{ top: 5, right: 20, bottom: 25, left: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#888" 
+                    tick={{ fill: "#888" }}
+                    tickLine={{ stroke: "#888" }}
+                  />
+                  <YAxis 
+                    stroke="#888" 
+                    tick={{ fill: "#888" }}
+                    tickLine={{ stroke: "#888" }}
+                    label={{ value: 'Tasks Remaining', angle: -90, position: 'insideLeft', fill: "#888", dy: 50 }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: "#252525", borderColor: "#444", borderRadius: "4px", color: "#fff" }}
+                    labelStyle={{ color: "#fff", fontWeight: "bold", marginBottom: "5px" }}
+                    itemStyle={{ padding: "2px 0" }}
+                  />
+                  <Legend verticalAlign="top" height={36} />
+                  <Line 
+                    type="monotone" 
+                    dataKey="ideal" 
+                    stroke="#4ADE80" 
+                    strokeWidth={2} 
+                    dot={false} 
+                    name="Ideal" 
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="actual" 
+                    stroke="#60A5FA" 
+                    strokeWidth={2} 
+                    dot={{ r: 3, fill: "#60A5FA" }} 
+                    activeDot={{ r: 5 }}
+                    name="Actual"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            
+            <div className="mt-4 p-3 bg-[#252525] rounded-lg text-sm text-gray-300">
+              <div className="flex items-center mb-1">
+                <AlertCircle size={14} className="text-yellow-500 mr-2" />
+                <span>Current velocity: <span className="text-white font-medium">3.5 tasks/day</span></span>
               </div>
-              
-              <div className="flex">
-                <div className="w-8 h-8 rounded-full bg-green-700 flex items-center justify-center text-white font-medium flex-shrink-0">
-                  AK
-                </div>
-                <div className="ml-4">
-                  <p className="text-white">
-                    <span className="font-medium">Alex Kim</span>
-                    <span className="text-gray-400"> completed task: </span>
-                    <span className="text-blue-400">Set up API routes</span>
-                  </p>
-                  <p className="text-gray-500 text-sm mt-1">Yesterday</p>
-                </div>
-              </div>
-              
-              <div className="flex">
-                <div className="w-8 h-8 rounded-full bg-pink-700 flex items-center justify-center text-white font-medium flex-shrink-0">
-                  LM
-                </div>
-                <div className="ml-4">
-                  <p className="text-white">
-                    <span className="font-medium">Lisa Moore</span>
-                    <span className="text-gray-400"> changed the due date to </span>
-                    <span className="text-blue-400">Dec 15, 2023</span>
-                  </p>
-                  <p className="text-gray-500 text-sm mt-1">2 days ago</p>
-                </div>
+              <div className="flex items-center">
+                <Flag size={14} className="text-blue-500 mr-2" />
+                <span>Projected completion: <span className="text-white font-medium">Dec 12, 2023</span> (3 days early)</span>
               </div>
             </div>
           </div>
         </div>
         
+        {/* Right Column (Progress and Team) */}
         <div className="lg:col-span-1">
+          {/* Progress Widget */}
           <div className="bg-[#1c1c1c] rounded-xl p-6 shadow-lg mb-6">
             <h2 className="text-xl font-semibold text-white mb-4">Progress</h2>
             
@@ -164,7 +377,7 @@ function ProjectDetails() {
                   <circle 
                     className="text-blue-600" 
                     strokeWidth="10" 
-                    strokeDasharray={`${project.progress * 2.51} 251.2`} 
+                    strokeDasharray={`${(completedTasks/totalTasks * 100) * 2.51} 251.2`} 
                     strokeLinecap="round" 
                     stroke="currentColor" 
                     fill="transparent" 
@@ -174,7 +387,7 @@ function ProjectDetails() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-3xl font-bold text-white">{project.progress}%</span>
+                  <span className="text-3xl font-bold text-white">{Math.round(completedTasks/totalTasks * 100)}%</span>
                 </div>
               </div>
               
@@ -182,86 +395,188 @@ function ProjectDetails() {
                 <div className="flex items-center mb-2">
                   <CheckSquare size={16} className="text-green-500 mr-2" />
                   <span className="text-white">
-                    {project.tasks.filter(t => t.completed).length} / {project.tasks.length} tasks completed
+                    {completedTasks} / {totalTasks} tasks completed
                   </span>
                 </div>
                 
                 <div className="flex items-center mb-2">
                   <Calendar size={16} className="text-blue-500 mr-2" />
                   <span className="text-white">
-                    Due on {new Date(project.dueDate).toLocaleDateString()}
+                    Due on {new Date(project.endDate).toLocaleDateString()}
                   </span>
                 </div>
                 
                 <div className="flex items-center">
                   <Clock size={16} className="text-yellow-500 mr-2" />
                   <span className="text-white">
-                    Updated 2 hours ago
+                    Updated {project.lastUpdated}
                   </span>
                 </div>
               </div>
             </div>
           </div>
           
+          {/* Team Widget */}
           <div className="bg-[#1c1c1c] rounded-xl p-6 shadow-lg mb-6">
             <h2 className="text-xl font-semibold text-white mb-4">Team</h2>
             
             <div className="flex -space-x-2 mb-4">
-              <div className="w-10 h-10 rounded-full border-2 border-[#1c1c1c] bg-purple-700 flex items-center justify-center text-white font-medium">
-                JS
-              </div>
-              <div className="w-10 h-10 rounded-full border-2 border-[#1c1c1c] bg-green-700 flex items-center justify-center text-white font-medium">
-                AK
-              </div>
-              <div className="w-10 h-10 rounded-full border-2 border-[#1c1c1c] bg-pink-700 flex items-center justify-center text-white font-medium">
-                LM
-              </div>
-              {project.collaborators > 3 && (
-                <div className="w-10 h-10 rounded-full border-2 border-[#1c1c1c] bg-gray-700 flex items-center justify-center text-white font-medium">
-                  +{project.collaborators - 3}
+              {project.collaborators.map(collaborator => (
+                <div 
+                  key={collaborator.id}
+                  className={`w-10 h-10 rounded-full border-2 border-[#1c1c1c] ${collaborator.color} flex items-center justify-center text-white font-medium`}
+                >
+                  {collaborator.initials}
                 </div>
-              )}
+              ))}
             </div>
             
-            <button className="w-full py-2.5 bg-[#252525] hover:bg-[#2e2d2d] text-gray-300 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center">
+            <button 
+              className="w-full py-2.5 bg-[#252525] hover:bg-[#2e2d2d] text-gray-300 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
+              onClick={() => setShowInviteModal(true)}
+            >
               <Users size={16} className="mr-2" />
               Manage Team
             </button>
           </div>
           
+          {/* Meeting Notes */}
           <div className="bg-[#1c1c1c] rounded-xl p-6 shadow-lg">
-            <h2 className="text-xl font-semibold text-white mb-4">Comments</h2>
-            
-            <div className="space-y-4 mb-4">
-              <div className="bg-[#252525] p-3 rounded-lg">
-                <div className="flex items-start">
-                  <div className="w-8 h-8 rounded-full bg-green-700 flex items-center justify-center text-white font-medium flex-shrink-0">
-                    AK
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-white text-sm font-medium">Alex Kim</p>
-                    <p className="text-gray-400 text-sm mt-1">
-                      The API routes are set up, but we need to add authentication to secure endpoints.
-                    </p>
-                    <p className="text-gray-500 text-xs mt-2">Yesterday</p>
-                  </div>
-                </div>
-              </div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-white">Meeting Notes</h2>
+              <button 
+                className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                onClick={() => setShowAddNoteModal(true)}
+              >
+                <PlusCircle size={16} />
+              </button>
             </div>
             
-            <div className="flex">
-              <div className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white font-medium flex-shrink-0">
-                JS
-              </div>
-              <input 
-                type="text" 
-                placeholder="Add a comment..." 
-                className="ml-3 bg-[#252525] border-none text-white w-full rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+            <div className="space-y-4">
+              {meetingNotes.map(note => (
+                <div key={note.id} className="bg-[#252525] p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium text-white">{note.title}</h3>
+                    <div className="text-xs text-gray-400">{note.createdAt}</div>
+                  </div>
+                  <p className="text-gray-300 text-sm mb-3">{note.content}</p>
+                  <div className="flex items-center text-xs text-gray-400">
+                    <div className={`w-5 h-5 rounded-full ${note.createdBy === "JS" ? "bg-purple-700" : note.createdBy === "AK" ? "bg-green-700" : "bg-pink-700"} flex items-center justify-center text-white font-medium mr-2`}>
+                      {note.createdBy}
+                    </div>
+                    <span>Added by {note.createdBy}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Invite User Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-[#252525] rounded-xl p-6 shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-white">Invite Team Member</h3>
+              <button 
+                className="text-gray-400 hover:text-white"
+                onClick={() => setShowInviteModal(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleInviteUser}>
+              <div className="mb-4">
+                <label className="block text-gray-300 mb-2 text-sm">Username</label>
+                <input
+                  type="text"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  placeholder="Enter username"
+                  className="w-full p-3 bg-[#1c1c1c] border border-[#444] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-transparent border border-[#444] text-gray-300 rounded-lg hover:bg-[#333]"
+                  onClick={() => setShowInviteModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Invite
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
+      {/* Add Meeting Note Modal */}
+      {showAddNoteModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-[#252525] rounded-xl p-6 shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-white">Add Meeting Note</h3>
+              <button 
+                className="text-gray-400 hover:text-white"
+                onClick={() => setShowAddNoteModal(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleAddNote}>
+              <div className="mb-4">
+                <label className="block text-gray-300 mb-2 text-sm">Title</label>
+                <input
+                  type="text"
+                  value={newNote.title}
+                  onChange={(e) => setNewNote({...newNote, title: e.target.value})}
+                  placeholder="Meeting title"
+                  className="w-full p-3 bg-[#1c1c1c] border border-[#444] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-gray-300 mb-2 text-sm">Content</label>
+                <textarea
+                  value={newNote.content}
+                  onChange={(e) => setNewNote({...newNote, content: e.target.value})}
+                  placeholder="Meeting notes..."
+                  className="w-full p-3 bg-[#1c1c1c] border border-[#444] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+                  required
+                />
+              </div>
+              
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-transparent border border-[#444] text-gray-300 rounded-lg hover:bg-[#333]"
+                  onClick={() => setShowAddNoteModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Add Note
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

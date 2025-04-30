@@ -28,7 +28,6 @@ function TodayTasks({ tasks }) {
         return 'border-l-blue-500';
     }
   };
-  console.log(tasks);
   
   return (
     <div className="bg-[#1c1c1c] rounded-xl p-6 shadow-lg h-full">

@@ -6,13 +6,22 @@ const { getProjectDetailsByProjectId,
 const createProject = async (req, res) => {
     try {
         const { userId } = req.params;
+        const { title, description, startDate, endDate } = req.body;
+        const projectData = {
+            title,
+            description,
+            startDate,
+            endDate
+        };
 
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({ success: false, message: "User not found" });
         }
 
-        const newProject = await createProjectByUserId(userId);
-
+        const newProject = await createProjectByUserId(userId, projectData);
+        if (!newProject) {
+            return res.status(400).json({ success: false, message: "Failed to create project" });
+        }
         res.status(200).json({ success: true, project: newProject });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
