@@ -61,7 +61,6 @@ export default function Dashboard() {
     fetchProjects();
   }, []);
 
-  console.log("Projects:", projects);
   
 
   // Function to transform API project data to match component expectations

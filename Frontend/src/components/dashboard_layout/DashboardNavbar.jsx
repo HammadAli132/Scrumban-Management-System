@@ -24,7 +24,6 @@ function Navbar() {
     getNotifications();
   }, [location.pathname])
 
-  console.log("Notifications:", notifications);
 
 
   const unreadNotifications = notifications.filter(n => !n.read).length;

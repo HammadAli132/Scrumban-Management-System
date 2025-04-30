@@ -7,7 +7,6 @@ function CreateProjectModal({ onClose }) {
     name: '',
     description: '',
     dueDate: '',
-    collaborators: '',
   });
 
   const handleChange = (e) => {
@@ -15,7 +14,7 @@ function CreateProjectModal({ onClose }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Here you would typically submit the data to your backend
     console.log('Submitting project:', formData);
@@ -88,23 +87,6 @@ function CreateProjectModal({ onClose }) {
               </div>
             </div>
             
-            <div>
-              <label htmlFor="collaborators" className="block text-sm font-medium text-gray-400 mb-1">
-                Collaborators
-              </label>
-              <div className="relative">
-                <Users size={16} className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  type="text"
-                  id="collaborators"
-                  name="collaborators"
-                  value={formData.collaborators}
-                  onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 bg-[#252525] border border-[#3a3939] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Add emails or usernames"
-                />
-              </div>
-            </div>
           </div>
           
           <div className="mt-6 flex gap-3">
