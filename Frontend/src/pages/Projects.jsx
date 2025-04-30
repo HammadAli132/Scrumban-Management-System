@@ -241,7 +241,6 @@ function ProjectDetails() {
 		try {
 			const response = await axios.get(`${apiUrl}/sprints/project/${projectid}`);
 			setSprints(response.data.sprints);
-			console.log("Sprints: ", response.data.sprints);
 
 		} catch (error) {
 			console.error("Error fetching sprints:", error);
@@ -251,7 +250,6 @@ function ProjectDetails() {
 		try {
 			const response = await axios.get(`${apiUrl}/projects/${projectid}`);
 			setProject(response.data.project);
-			console.log("Project: ", response.data.project);
 
 		} catch (error) {
 			console.error("Error fetching project:", error);
@@ -290,6 +288,16 @@ function ProjectDetails() {
 		}
 	}
 
+	const createMeetingNote = async () => {
+		try {
+			await axios.post(`${apiUrl}/meeting-notes/project/${projectid}`, newNote);
+			await getProjectData(); // Refresh project data after adding note
+			setNewNote({ title: '', content: '' });
+			setShowAddNoteModal(false);
+		} catch (error) {
+			console.error("Error adding meeting note:", error);
+		}
+	}
 
 	useEffect(() => {
 
@@ -333,21 +341,12 @@ function ProjectDetails() {
 
 	};
 
-	const handleAddNote = (e) => {
+	const handleAddNote = async (e) => {
 		e.preventDefault();
 		if (!newNote.title.trim() || !newNote.content.trim()) return;
 
 		// In a real app, you would call an API to add the note
-		const newNoteWithId = {
-			id: meetingNotes.length + 1,
-			...newNote,
-			createdAt: new Date().toISOString().split('T')[0],
-			createdBy: "JS" // Current user
-		};
-
-		setMeetingNotes([newNoteWithId, ...meetingNotes]);
-		setNewNote({ title: '', content: '' });
-		setShowAddNoteModal(false);
+		await createMeetingNote();
 	};
 
 	const getPriorityBadge = (priority) => {
