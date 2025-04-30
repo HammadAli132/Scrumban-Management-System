@@ -11,6 +11,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem('user'));
+  const [onProjectCreated, setOnProjectCreated] = useState(false);
   const [todayTasks, setTodayTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [filterType, setFilterType] = useState('all');
@@ -59,7 +60,7 @@ export default function Dashboard() {
     }
 
     fetchProjects();
-  }, []);
+  }, [onProjectCreated]);
 
   
 
@@ -159,7 +160,7 @@ export default function Dashboard() {
 
       {/* Create Project Modal */}
       {showCreateModal && (
-        <CreateProjectModal onClose={() => setShowCreateModal(false)} />
+        <CreateProjectModal setOnProjectCreated={setOnProjectCreated} onClose={() => setShowCreateModal(false)} />
       )}
     </div>
   );
