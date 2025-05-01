@@ -33,8 +33,8 @@ const getAllCommitsByRepositoryId = async (repoId) => {
 
 const updateCommitStatusByCommitId = async (commitId, updatedStatus) => {
     try {
-        if (!commitId) {
-            throw new Error("Commit ID is required");
+        if (!commitId || !updatedStatus) {
+            throw new Error("Commit ID and Updated Status both are required");
         }
 
         if (updatedStatus == 'rejected') {
@@ -44,7 +44,7 @@ const updateCommitStatusByCommitId = async (commitId, updatedStatus) => {
         }
 
         const updatedCommit = await Commit.findByIdAndUpdate(
-            {_id: commitId},
+            commitId,
             { status: updatedStatus },
             { new: true }
         );

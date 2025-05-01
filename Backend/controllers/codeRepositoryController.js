@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const { getCodeRepositoryIdByProjectId,
-    getAllCommitsByRepositoryId,
-    updateCommitStatusByCommitId } = require('../services/codeRepositoryService')
+        getAllCommitsByRepositoryId,
+        updateCommitStatusByCommitId } = require('../services/codeRepositoryService')
 
 const getCodeRepositoryId = async (req, res) => {
     try {
