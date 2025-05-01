@@ -20,52 +20,6 @@ import { compareAsc, parseISO } from 'date-fns';
 import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL
 
-const defaultTasks = [
-  {
-    id: '1',
-    title: 'Design System Implementation',
-    description: 'Create a comprehensive design system for the project',
-    status: 'todo',
-    priority: 'high',
-    assignee: 'John Smith',
-    dueDate: '2024-03-15',
-    comments: [],
-    createdAt: '2024-03-01T10:00:00Z'
-  },
-  {
-    id: '2',
-    title: 'API Integration',
-    description: 'Integrate third-party APIs for payment processing',
-    status: 'in-progress',
-    priority: 'medium',
-    assignee: 'Alex Kim',
-    dueDate: '2024-03-20',
-    comments: [],
-    createdAt: '2024-03-02T10:00:00Z'
-  },
-  {
-    id: '3',
-    title: 'User Authentication',
-    description: 'Implement secure user authentication flow',
-    status: 'in-progress',
-    priority: 'high',
-    assignee: 'Lisa Moore',
-    dueDate: '2024-03-10',
-    comments: [],
-    createdAt: '2024-03-03T10:00:00Z'
-  },
-  {
-    id: '4',
-    title: 'Database Schema',
-    description: 'Design and implement database schema',
-    status: 'done',
-    priority: 'medium',
-    assignee: 'John Smith',
-    dueDate: '2024-03-25',
-    comments: [],
-    createdAt: '2024-03-04T10:00:00Z'
-  },
-];
 
 const columns = [
   { id: 'ToDo', title: 'To Do', color: 'border-red-500/20' },
@@ -137,8 +91,7 @@ export default function KanbanBoard() {
     initializeTasks();
 
   }, []);
-  console.log("tasks", tasks);
-  console.log(sprints);
+
 
 
   const sensors = useSensors(

@@ -165,9 +165,26 @@ const deleteProjectById = async (projectId) => {
     }
 };
 
+const checkIfUserIsOwner = async (projectId, userId) => {
+    try {
+        const project = await Project.findById(projectId);
+        if (!project) {
+            throw new Error("Project not found");
+        }
+
+        const isOwner = project.userId.toString() === userId.toString();
+        return isOwner;
+    } catch (error) {
+        console.log(error);
+        
+        throw new Error("Error checking project ownership: " + error.message);
+    }
+}
+
 module.exports = {
     getProjectDetailsByProjectId,
     getProjectDetailsByUserId,
     createProjectByUserId,
-    deleteProjectById
+    deleteProjectById,
+    checkIfUserIsOwner
 }

@@ -1,7 +1,7 @@
 const { getProjectDetailsByProjectId,
         getProjectDetailsByUserId, 
         createProjectByUserId,
-        deleteProjectById} = require("../services/projectService");
+        deleteProjectById, checkIfUserIsOwner} = require("../services/projectService");
 
 const createProject = async (req, res) => {
     try {
@@ -79,9 +79,32 @@ const deleteProject = async (req, res) => {
     }
 }
 
+const isUserProjectOwner = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        const { userId } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(projectId)) {
+            return res.status(400).json({ success: false, message: "Project not found" });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ success: false, message: "User not found" });
+        }
+
+        const isOwner = await checkIfUserIsOwner(projectId, userId);
+
+        res.status(200).json({ success: true, isOwner });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+}
+
 module.exports = {
     getProjectDetails,
     getUserProjectsDetails,
     createProject,
-    deleteProject
+    deleteProject,
+    isUserProjectOwner
 }

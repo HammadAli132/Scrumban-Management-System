@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css'; // Import a syntax highlighting theme
+import axios from 'axios';
+const apiUrl = import.meta.env.VITE_API_URL; 
 
 // Define sample data (in a real app, you would fetch this from your API)
 const sampleRepositories = [
@@ -261,9 +263,8 @@ const syntaxHighlightingStyles = `
 `;
 
 export default function Repository() {
-  const { projectid } = useParams();
+  const { projectid, repositoryid } = useParams();
   const [commits, setCommits] = useState(sampleCommits);
-  const [currentPath, setCurrentPath] = useState([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [fileToUpload, setFileToUpload] = useState(null);
   const [filePreview, setFilePreview] = useState('');
@@ -272,12 +273,53 @@ export default function Repository() {
   const [isUploading, setIsUploading] = useState(false);
   const [currentRepository, setCurrentRepository] = useState(sampleRepositories[0]);
   const [showFileDetails, setShowFileDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isProjectOwner, setIsProjectOwner] = useState(false);
   
   // In real app, you'd fetch this from your API based on logged in user
-  const user = JSON.parse(localStorage.getItem('user') || '{"_id":"user1","isProjectOwner":true}');
+  const user = JSON.parse(localStorage.getItem('user'));
   
   // Check if user is the project owner (in real app, fetch project details and check)
-  const isProjectOwner = user?.isProjectOwner === true;
+  const checkIfUserIsProjectOwner = async () => {
+    try {
+      const response = await axios.post(`${apiUrl}/projects/isowner/${projectid}`, { userId: user.id });
+      if (response.data.success) {
+        setIsProjectOwner(response.data.isOwner);
+      } else {
+        console.error('Error checking project ownership:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error checking project ownership:', error.message);
+    }
+  }
+
+  const getAllCommits = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/code-repository/commits/${repositoryid}`);
+      if (response.data.success) {
+        setCommits(response.data.commits);
+        console.log(response.data.commits);
+        
+      } else {
+        console.error('Error fetching commits:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching commits:', error.message);
+    }
+  }
+
+
+  useEffect(() => {
+    const initializeData = async () => {
+      await checkIfUserIsProjectOwner();
+      await getAllCommits();
+      setLoading(false);
+    }
+
+    initializeData();
+  }, []);
+
+  
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
@@ -354,6 +396,10 @@ export default function Repository() {
     };
   }, []);
 
+  if (loading) {
+    return <div className="text-white w-full flex items-center justify-center">Loading...</div>;
+  }
+
   return (
     <div className="px-4 py-6 md:px-6 lg:px-8">
       <div className="mb-6">
@@ -362,7 +408,7 @@ export default function Repository() {
         </Link>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-1">{currentRepository.name}</h1>
+            <h1 className="text-2xl font-bold text-white mb-1">Code Repository</h1>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <GitBranch size={16} className="text-gray-400" />
@@ -477,7 +523,7 @@ export default function Repository() {
                     <div className="mt-4 flex items-center gap-3 text-sm text-gray-400">
                       <span className="font-mono">#{commit.hash}</span>
                       <span>•</span>
-                      <span>By User {commit.userId}</span>
+                      <span>By User {commit.userId.username}</span>
                     </div>
                   </div>
                 )}

@@ -28,7 +28,8 @@ const getAllCommits = async (req, res) => {
             return res.status(404).json({ success: false, message: "Code Repository not found!" });
         }
 
-        const commits = getAllCommitsByRepositoryId(repoId);
+        const commits = await getAllCommitsByRepositoryId(repoId);
+        
 
         res.status(200).json({ success: true, commits });
     } catch (error) {

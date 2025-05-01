@@ -20,10 +20,21 @@ const getAllCommitsByRepositoryId = async (repoId) => {
         if (!repoId) {
             throw new Error("Repository ID is required");
         }
-
+        const repositoryId = repoId.toString();
+        
+        // Check if the repository exists
+        const repository = await CodeRepository.findById(repositoryId);
+        if (!repository) {
+            throw new Error("Code repository not found");
+        }
+        
         // Get all commits for the repository, sorted by timestamp (newest first)
-        const commits = await Commit.find({ repositoryId: repoId })
-            .sort({ timestamp: -1 }); // -1 for descending (newest first)
+        const commits = await Commit.find({ repositoryId })
+            .populate('userId', 'name username')
+            .sort({ createdAt: -1 }); // -1 for descending (newest first)
+
+
+        
 
         return commits;
     } catch (error) {
