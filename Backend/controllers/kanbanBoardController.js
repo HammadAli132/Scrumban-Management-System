@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 const { createKanbanBoardTaskByProjectId,
-        getKanbanBoardByProjectId,
-        updateKanbanBoardTitleById,
-        updateKanbanBoardTaskById,
-        getKanbanBoardIdByProjectId,
-        deleteKanbanBoardTaskById,
-        addCommentToKanbanTaskByTaskId,
-        getAllTasksByKanbanId,
-        updateKanbanTaskSwimLaneByTaskId } = require("../services/kanbanBoardService");
+    getKanbanBoardByProjectId,
+    updateKanbanBoardTitleById,
+    updateKanbanBoardTaskById,
+    getKanbanBoardIdByProjectId,
+    deleteKanbanBoardTaskById,
+    addCommentToKanbanTaskByTaskId,
+    getAllTasksByKanbanId,
+    updateKanbanTaskSwimLaneByTaskId,
+    deleteKanbanBoardTaskCommentByCommentAndTaskId } = require("../services/kanbanBoardService");
 
 const createKanbanBoardTask = async (req, res) => {
     try {
@@ -206,18 +207,38 @@ const updateTaskSwimLane = async (req, res) => {
         }
 
         if (!swimLane) {
-            return res.status(400).json({success: false, message: "Swim lane status is required"});
+            return res.status(400).json({ success: false, message: "Swim lane status is required" });
         }
 
         // Update the task swim lane
         const result = await updateKanbanTaskSwimLaneByTaskId(taskId, swimLane);
-        
+
         res.status(200).json({
             success: true,
             message: "Task swim lane updated successfully",
             data: result
         });
-        
+
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+const deleteKanbanBoardTaskComment = async (req, res) => {
+    try {
+        const { commentId, taskId } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(taskId)) {
+            return res.status(404).json({ success: false, message: "Kanban board task not found!" });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(commentId)) {
+            return res.status(404).json({ success: false, message: "Kanban board task comment not found!" });
+        }
+
+        const deletedComment = await deleteKanbanBoardTaskCommentByCommentAndTaskId(commentId, taskId);
+
+        res.status(200).json({success: true, deletedComment});
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -232,5 +253,6 @@ module.exports = {
     deleteKanbanBoardTask,
     addCommentToKanbanTask,
     getTasksOfKanbanBoard,
-    updateTaskSwimLane
+    updateTaskSwimLane,
+    deleteKanbanBoardTaskComment
 };

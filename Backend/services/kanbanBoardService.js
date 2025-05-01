@@ -95,7 +95,7 @@ const getKanbanBoardIdByProjectId = async (projectId) => {
 const deleteKanbanBoardTaskById = async (taskId) => {
     try {
         await Comment.deleteMany({kanbanBoardTaskId: taskId});
-        
+
         const deletedTask = await KanbanBoardTask.findOneAndDelete({ _id: taskId });
 
         if (!deletedTask) {
@@ -191,7 +191,23 @@ const updateKanbanTaskSwimLaneByTaskId = async (taskId, swimLaneStatus) => {
     } catch (error) {
         throw new Error("Error fetching tasks: " + error.message);
     }
-}
+};
+
+const deleteKanbanBoardTaskCommentByCommentAndTaskId = async (commentId, taskId) => {
+    try {
+        if (!commentId || !taskId) {
+            throw new Error("Both commentId and taskId are required");
+        }
+
+        const deletedTaskComment = await Comment.findOneAndDelete(
+            {_id: commentId, kanbanBoardTaskId: taskId}
+        );
+
+        return deletedTaskComment;
+    } catch (error) {
+        throw new Error("Error fetching tasks: " + error.message);
+    }
+};
 
 module.exports = {
     getKanbanBoardByProjectId,
@@ -202,5 +218,6 @@ module.exports = {
     deleteKanbanBoardTaskById,
     addCommentToKanbanTaskByTaskId,
     getAllTasksByKanbanId,
-    updateKanbanTaskSwimLaneByTaskId
+    updateKanbanTaskSwimLaneByTaskId,
+    deleteKanbanBoardTaskCommentByCommentAndTaskId
 };
