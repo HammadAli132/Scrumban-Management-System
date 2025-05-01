@@ -69,7 +69,7 @@ const defaultTasks = [
 
 const columns = [
   { id: 'ToDo', title: 'To Do', color: 'border-red-500/20' },
-  { id: 'Doin', title: 'In Progress', color: 'border-yellow-500/20' },
+  { id: 'Doing', title: 'In Progress', color: 'border-yellow-500/20' },
   { id: 'Done', title: 'Done', color: 'border-green-500/20' },
 ];
 
@@ -317,6 +317,7 @@ export default function KanbanBoard() {
           onUpdate={handleTaskUpdate}
           onDelete={handleTaskDelete}
           sprints={sprints}
+          setChanged={setChanged}
         />
       )}
     </div>

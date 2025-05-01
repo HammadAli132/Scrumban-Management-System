@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { X, Calendar, User, MessageSquare, Edit2, Trash2, ClipboardList } from 'lucide-react';
 import { format } from 'date-fns';
+import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
-export default function TaskModal({ task, onClose, onUpdate, onDelete, sprints = [] }) {
-  const user = useState(JSON.parse(localStorage.getItem('user')));
+export default function TaskModal({ task, onClose, onUpdate, onDelete, sprints = [], setChanged }) {
+  const user = JSON.parse(localStorage.getItem('user'));
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
   const [newComment, setNewComment] = useState('');
@@ -15,31 +17,45 @@ export default function TaskModal({ task, onClose, onUpdate, onDelete, sprints =
     setIsEditing(false);
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
-    const comment = {
-      id: Date.now().toString(),
-      text: newComment,
-      userId: {
-        _id: user.id, // Replace with actual user ID
-        username: "Current User" // Replace with actual username
-      },
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      const response = await axios.post(`${apiUrl}/kanban/comment/${editedTask.id}`, {
+        text: newComment,
+        userId: user.id,
+      })
+      const comment = response.data.newComment;
 
-    setEditedTask({
-      ...editedTask,
-      comments: [...editedTask.comments, comment],
-    });
+      setEditedTask({
+        ...editedTask,
+        comments: [...editedTask.comments, comment]
+      })
+      setChanged((prev) => !prev);
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+    
+    
     setNewComment('');
   };
 
-  const handleDeleteComment = (commentId) => {
-    setEditedTask({
-      ...editedTask,
-      comments: editedTask.comments.filter((c) => c.id !== commentId),
-    });
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await axios.delete(`${apiUrl}/kanban/kanbantaskcomment`, {
+        commentId: commentId,
+        taskId: editedTask.id
+      })
+      setEditedTask({
+        ...editedTask,
+        comments: editedTask.comments.filter((c) => c.id !== commentId),
+      });
+      setChanged((prev) => !prev);
+    } catch (error) {
+      console.error("Error deleting comment: ", error);
+    }
+
+    
   };
 
   // Format sprint dates for display

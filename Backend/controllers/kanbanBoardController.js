@@ -165,7 +165,7 @@ const addCommentToKanbanTask = async (req, res) => {
         res.status(201).json({
             success: true,
             message: "Comment added successfully",
-            data: newComment
+            newComment
         });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });

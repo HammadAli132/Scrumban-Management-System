@@ -125,6 +125,8 @@ const addCommentToKanbanTaskByTaskId = async (taskId, userId, text) => {
 
         return newComment;
     } catch (error) {
+        console.log(error);
+        
         throw new Error("Error adding comment to task: " + error.message);
     }
 };
