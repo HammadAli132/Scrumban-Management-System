@@ -4,7 +4,7 @@ const Commit = require('../models/commit');
 const getCodeRepositoryIdByProjectId = async (projectId) => {
     try {
         const repository = await CodeRepository.findOne({ projectId: projectId });
-        
+
         if (!repository) {
             throw new Error("Code repository not found for this project");
         }
@@ -29,9 +29,34 @@ const getAllCommitsByRepositoryId = async (repoId) => {
     } catch (error) {
         throw new Error(`Error getting commits in repository: ${error.message}`);
     }
-}
+};
 
-model.exports = {
+const updateCommitStatusByCommitId = async (commitId, status) => {
+    try {
+        if (!commitId) {
+            throw new Error("Commit ID is required");
+        }
+
+        if (status == 'rejected') {
+            const deletedCommit = await Commit.findByIdAndDelete({ _id: commitId });
+
+            return deletedCommit;
+        }
+
+        const updatedCommit = await Commit.findByIdAndUpdate(
+            { _id: commitId },
+            { status: status },
+            { new: true }
+        );
+
+        return updatedCommit;
+    } catch (error) {
+        throw new Error(`Error updating commit status: ${error.message}`);
+    }
+};
+
+module.exports = {
     getCodeRepositoryIdByProjectId,
-    getAllCommitsByRepositoryId
+    getAllCommitsByRepositoryId,
+    updateCommitStatusByCommitId
 }

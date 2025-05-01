@@ -14,6 +14,7 @@ const projectRouter = require("./routes/projectRoutes.js");
 const sprintRouter = require("./routes/sprintRoutes.js");
 const collaboratorRouter = require("./routes/collaboratorRoutes.js");
 const meetingNoteRouter = require("./routes/meetingNoteRoutes.js");
+const codeRepositoryRouter = require("./routes/codeRepositoryRoutes.js")
 
 dotenv.config();
 const app = express();
@@ -33,6 +34,7 @@ app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/sprints", sprintRouter);
 app.use("/api/v1/collaborators", collaboratorRouter);
 app.use("/api/v1/meeting-notes", meetingNoteRouter);
+app.use("/api/v1/code-repository", codeRepositoryRouter);
 
 app.get('/', (req, res) => {
 	res.send('Hello World!');
