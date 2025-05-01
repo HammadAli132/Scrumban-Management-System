@@ -72,6 +72,24 @@ const sprintService = {
     
     await sprint.save();
     return sprint;
+  },
+
+  getAllSprints: async (projectId) => {
+    // Validate projectId
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      throw new Error('Invalid project ID');
+    }
+    
+    // Check if project exists
+    const projectExists = await Project.findById(projectId);
+    if (!projectExists) {
+      throw new Error('Project not found');
+    }
+    
+    // Get all sprints for the project
+    const sprints = await Sprint.find({ projectId });
+    
+    return sprints;
   }
 };
 

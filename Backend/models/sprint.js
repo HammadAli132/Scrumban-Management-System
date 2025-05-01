@@ -23,6 +23,6 @@ const sprintSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-const Sprint = mongoose.model("Sprint", sprintSchema);
+const Sprint = mongoose.model("sprint", sprintSchema);
 
 module.exports = Sprint;

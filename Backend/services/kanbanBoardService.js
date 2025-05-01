@@ -72,6 +72,8 @@ const createKanbanBoardTaskByProjectId = async (projectId, taskData) => {
 
         return newTask;
     } catch (error) {
+        console.log(error.message);
+        
         throw new Error("Error creating kanban board task: " + error.message);
     }
 };
@@ -138,10 +140,35 @@ const getAllTasksByKanbanId = async (kanbanBoardId) => {
         const tasks = await KanbanBoardTask.find({ kanbanBoardId })
             .populate('userId', 'username')
             .populate('sprintId', 'title startDate endDate')
-            .sort({ createdAt: -1 }); // Newest first
+            .sort({ createdAt: -1 });
 
-        return tasks;
+        // Get comments for all tasks in one query
+        const taskIds = tasks.map(task => task._id);
+        const comments = await Comment.find({ 
+            kanbanBoardTaskId: { $in: taskIds } 
+        }).populate('userId', 'username');
+
+        // Group comments by task ID
+        const commentsByTask = comments.reduce((acc, comment) => {
+            const taskId = comment.kanbanBoardTaskId.toString();
+            if (!acc[taskId]) {
+                acc[taskId] = [];
+            }
+            acc[taskId].push(comment);
+            return acc;
+        }, {});
+
+        // Add comments to each task
+        const tasksWithComments = tasks.map(task => {
+            return {
+                ...task.toObject(),
+                comments: commentsByTask[task._id.toString()] || []
+            };
+        });
+
+        return tasksWithComments;
     } catch (error) {
+        console.log(error.message);
         throw new Error("Error fetching tasks: " + error.message);
     }
 };

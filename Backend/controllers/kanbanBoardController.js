@@ -28,13 +28,7 @@ const createKanbanBoardTask = async (req, res) => {
         } = req.body;
 
         const taskData = {
-            ...(title != undefined && { title }),
-            ...(description != undefined && { description }),
-            ...(priorityLevel != undefined && { priorityLevel }),
-            ...(dueDate != undefined && { dueDate }),
-            ...(swimLane != undefined && { swimLane }),
-            ...(sprintId != undefined && { sprintId }),
-            ...(userId != undefined && { userId })
+            title, description, priorityLevel, dueDate, swimLane, sprintId, userId
         };
 
         const newKanbanBoardTask = await createKanbanBoardTaskByProjectId(projectId, taskData);
@@ -195,7 +189,7 @@ const getTasksOfKanbanBoard = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            data: tasks
+            tasks
         });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });

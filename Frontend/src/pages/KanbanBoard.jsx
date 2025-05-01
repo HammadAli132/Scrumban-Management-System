@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   DndContext,
@@ -17,6 +17,8 @@ import TaskModal from '../components/kanban/TaskModal';
 import { Plus, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { compareAsc, parseISO } from 'date-fns';
+import axios from 'axios';
+const apiUrl = import.meta.env.VITE_API_URL
 
 const defaultTasks = [
   {
@@ -66,9 +68,9 @@ const defaultTasks = [
 ];
 
 const columns = [
-  { id: 'todo', title: 'To Do', color: 'border-red-500/20' },
-  { id: 'in-progress', title: 'In Progress', color: 'border-yellow-500/20' },
-  { id: 'done', title: 'Done', color: 'border-green-500/20' },
+  { id: 'ToDo', title: 'To Do', color: 'border-red-500/20' },
+  { id: 'Doin', title: 'In Progress', color: 'border-yellow-500/20' },
+  { id: 'Done', title: 'Done', color: 'border-green-500/20' },
 ];
 
 const priorityWeight = {
@@ -78,14 +80,67 @@ const priorityWeight = {
 };
 
 export default function KanbanBoard() {
-  const { projectid } = useParams();
-  const [tasks, setTasks] = useState(defaultTasks);
+  const { projectid, kanbanid } = useParams();
+  const [tasks, setTasks] = useState(null);
   const [activeTask, setActiveTask] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [dateFilter, setDateFilter] = useState('');
   const [sortBy, setSortBy] = useState('priority');
   const [createColumnId, setCreateColumnId] = useState('');
+  const [sprints, setSprints] = useState([]);
+  const [changed, setChanged] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/kanban/kanbantasks/${kanbanid}`);
+      if (response.data.success) {
+        setTasks(response.data.tasks.map((task) => ({
+          ...task,
+          id: task._id, // Use _id from the response as the task ID 
+          dueDate: task.dueDate ? task.dueDate.split('T')[0] : null, // Format date to YYYY-MM-DD
+        })));
+      } else {
+        console.error('Failed to fetch tasks:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const fetchSprints = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/sprints/sprints/${projectid}`);
+      if (response.data.success) {
+        setSprints(response.data.sprints);
+      } else {
+        console.error('Failed to fetch sprints:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching sprints:', error);
+    }
+  }
+
+  useEffect(() => {
+    fetchTasks();
+  }, [changed]);
+
+
+  useEffect(() => {
+    const initializeTasks = async () => {
+      await fetchTasks();
+      await fetchSprints();
+      setLoading(false);
+    }
+    initializeTasks();
+    
+  }, []);
+  console.log("tasks", tasks);
+  console.log(sprints);
+  
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -150,14 +205,19 @@ export default function KanbanBoard() {
     setSelectedTask(null);
   };
 
-  const handleNewTask = (task) => {
-    setTasks([...tasks, task]);
+  const handleNewTask = async (task) => {
+    try {
+      await axios.post(`${apiUrl}/kanban/${projectid}`, task);
+      setChanged(!changed); 
+    } catch (error) {
+      console.error('Error creating task:', error);
+    }
     setShowCreateModal(false);
   };
 
   // Filter and sort tasks
   const getFilteredAndSortedTasks = (columnId) => {
-    let filteredTasks = tasks.filter((task) => task.status === columnId);
+    let filteredTasks = tasks.filter((task) => task.swimLane === columnId);
 
     // Apply date filter
     if (dateFilter) {
@@ -169,12 +229,16 @@ export default function KanbanBoard() {
     // Apply sorting
     return filteredTasks.sort((a, b) => {
       if (sortBy === 'priority') {
-        return priorityWeight[b.priority] - priorityWeight[a.priority];
+        return priorityWeight[b.priorityLevel] - priorityWeight[a.priorityLevel];
       } else {
         return compareAsc(parseISO(a.dueDate), parseISO(b.dueDate));
       }
     });
   };
+
+  if (loading) {
+    return <div className="text-white w-full flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="px-4 py-6 md:px-6 lg:px-8">
@@ -232,6 +296,7 @@ export default function KanbanBoard() {
           onClose={() => setShowCreateModal(false)}
           onCreate={handleNewTask}
           columnId={createColumnId}
+          sprints={sprints}
         />
       )}
 

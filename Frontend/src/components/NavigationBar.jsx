@@ -39,8 +39,22 @@ export default function NavigationBar() {
             }
         }
 
-        fetchKanbanId();
+        const fetchRepoId = async () => {
+            try {
+                const response = await axios.get(`${apiUrl}/code-repository/repoId/${projectid}`);
+                const data = response.data;
+                if (data.success) {
+                    setRepoId(data.codeRepositoryId);
+                } else {
+                    console.error('Failed to fetch repoId:', data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching repoId:', error);
+            }
+        }
 
+        fetchKanbanId();
+        fetchRepoId();
     }, [projectid]);
     React.useEffect(() => {
         const currentPath = location.pathname;
@@ -113,9 +127,9 @@ export default function NavigationBar() {
                     </Link>
                 )}
                 {/* Repository Icon (conditionally shown) */}
-                {(projectid || projectIdState) && (
+                {((projectid || projectIdState) && repoId) && (
                     <Link
-                        to={`/project/${(projectid || projectIdState)}/repository/2`}
+                        to={`/project/${(projectid || projectIdState)}/repository/${repoId}`}
                         className="cursor-pointer hover:bg-[#2f2f2f] rounded-lg p-1 flex items-center justify-center"
                         onClick={() => setActiveIcon(4)}
                     >
