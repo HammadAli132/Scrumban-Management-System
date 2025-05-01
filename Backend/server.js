@@ -42,7 +42,7 @@ app.listen(PORT, () => {
 	try {
 		mongoose.connect("mongodb://localhost:27017/scrumbandb");
 		console.log(`Connected to MongoDB`);
-		//initDB();
+		initDB();
 		console.log(`Server is running at http://localhost:${PORT}`);
 
 	} catch (error) {

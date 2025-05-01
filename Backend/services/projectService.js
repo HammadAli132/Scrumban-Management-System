@@ -6,6 +6,7 @@ const CodeRepository = require('../models/codeRepository');
 const KanbanBoardTask = require('../models/kanbanBoardTask');
 const Commit = require('../models/commit');
 const Comment = require('../models/comment');
+const Sprint = require('../models/sprint');
 
 const createProjectByUserId = async (userId, projectData) => {
     try {
