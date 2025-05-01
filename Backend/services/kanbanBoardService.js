@@ -94,6 +94,8 @@ const getKanbanBoardIdByProjectId = async (projectId) => {
 
 const deleteKanbanBoardTaskById = async (taskId) => {
     try {
+        await Comment.deleteMany({kanbanBoardTaskId: taskId});
+        
         const deletedTask = await KanbanBoardTask.findOneAndDelete({ _id: taskId });
 
         if (!deletedTask) {
