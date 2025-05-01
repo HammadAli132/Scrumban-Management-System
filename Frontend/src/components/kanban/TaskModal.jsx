@@ -42,13 +42,12 @@ export default function TaskModal({ task, onClose, onUpdate, onDelete, sprints =
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await axios.delete(`${apiUrl}/kanban/kanbantaskcomment`, {
-        commentId: commentId,
-        taskId: editedTask.id
+      await axios.post(`${apiUrl}/kanban/kanbantaskcomment/${editedTask.id}`, {
+        commentId: commentId
       })
       setEditedTask({
         ...editedTask,
-        comments: editedTask.comments.filter((c) => c.id !== commentId),
+        comments: editedTask.comments.filter((c) => c._id !== commentId),
       });
       setChanged((prev) => !prev);
     } catch (error) {
@@ -285,7 +284,7 @@ export default function TaskModal({ task, onClose, onUpdate, onDelete, sprints =
                       </div>
                     </div>
                     <button
-                      onClick={() => handleDeleteComment(comment.id || comment._id)}
+                      onClick={() => handleDeleteComment(comment._id)}
                       className="text-gray-400 hover:text-red-500 transition-colors"
                     >
                       <Trash2 size={12} />

@@ -17,7 +17,7 @@ router.put("/boardtitle/:kanbanBoardId", updateKanbanBoardTitle);
 router.put("/kanbantask/:taskId", updateKanbanBoardTask);
 router.get("/kanbanId/:projectId", getKanbanBoardId);
 router.delete("/kanbantask/:taskId", deleteKanbanBoardTask);
-router.delete("/kanbantaskcomment", deleteKanbanBoardTaskComment);
+router.post("/kanbantaskcomment/:taskId", deleteKanbanBoardTaskComment);
 router.post("/comment/:taskId", addCommentToKanbanTask);
 router.get("/kanbantasks/:kanbanBoardId", getTasksOfKanbanBoard);
 router.put("/swimlane/:taskId", updateTaskSwimLane);

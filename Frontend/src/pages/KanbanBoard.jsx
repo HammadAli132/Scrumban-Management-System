@@ -85,7 +85,6 @@ export default function KanbanBoard() {
   const [activeTask, setActiveTask] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [dateFilter, setDateFilter] = useState('');
   const [sortBy, setSortBy] = useState('priority');
   const [createColumnId, setCreateColumnId] = useState('');
   const [sprints, setSprints] = useState([]);
@@ -136,11 +135,11 @@ export default function KanbanBoard() {
       setLoading(false);
     }
     initializeTasks();
-    
+
   }, []);
   console.log("tasks", tasks);
   console.log(sprints);
-  
+
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -161,9 +160,9 @@ export default function KanbanBoard() {
     if (task) setActiveTask(task);
   };
 
-  const handleDragEnd = (event) => {
+  const handleDragEnd = async (event) => {
     const { active, over } = event;
-    
+
     if (!over) return;
 
     const activeTask = tasks.find((t) => t.id === active.id);
@@ -171,13 +170,23 @@ export default function KanbanBoard() {
 
     if (!activeTask) return;
 
-    if (overColumn) {
-      setTasks((tasks) =>
-        tasks.map((t) =>
-          t.id === activeTask.id ? { ...t, status: overColumn.id } : t
-        )
-      );
+    try {
+      await axios.put(`${apiUrl}/kanban/swimlane/${activeTask.id}`, {
+        swimLane: overColumn.id,
+      });
+      if (overColumn) {
+        setTasks((tasks) =>
+          tasks.map((t) =>
+            t.id === activeTask.id ? { ...t, swimLane: overColumn.id } : t
+          )
+        );
+      }
+      setChanged(!changed);
+    } catch (error) {
+      console.error('Error updating task:', error);
     }
+
+
 
     setActiveTask(null);
   };
@@ -198,7 +207,7 @@ export default function KanbanBoard() {
   const handleTaskUpdate = async (updatedTask) => {
     try {
       await axios.put(`${apiUrl}/kanban/kanbantask/${updatedTask.id}`, updatedTask);
-      setChanged(!changed); 
+      setChanged(!changed);
     } catch (error) {
       console.error('Error updating task:', error);
     }
@@ -208,7 +217,7 @@ export default function KanbanBoard() {
   const handleTaskDelete = async (taskId) => {
     try {
       await axios.delete(`${apiUrl}/kanban/kanbantask/${taskId}`);
-      setChanged(!changed); 
+      setChanged(!changed);
     } catch (error) {
       console.error('Error deleting task:', error);
     }
@@ -218,7 +227,7 @@ export default function KanbanBoard() {
   const handleNewTask = async (task) => {
     try {
       await axios.post(`${apiUrl}/kanban/${projectid}`, task);
-      setChanged(!changed); 
+      setChanged(!changed);
     } catch (error) {
       console.error('Error creating task:', error);
     }
@@ -229,12 +238,7 @@ export default function KanbanBoard() {
   const getFilteredAndSortedTasks = (columnId) => {
     let filteredTasks = tasks.filter((task) => task.swimLane === columnId);
 
-    // Apply date filter
-    if (dateFilter) {
-      filteredTasks = filteredTasks.filter(
-        (task) => task.dueDate === dateFilter
-      );
-    }
+
 
     // Apply sorting
     return filteredTasks.sort((a, b) => {
@@ -260,8 +264,6 @@ export default function KanbanBoard() {
           <h1 className="text-2xl font-bold text-white">Project Tasks</h1>
           <div className="flex items-center gap-4">
             <KanbanFilters
-              dateFilter={dateFilter}
-              onDateFilterChange={setDateFilter}
               sortBy={sortBy}
               onSortChange={setSortBy}
             />

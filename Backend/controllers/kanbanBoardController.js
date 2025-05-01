@@ -220,7 +220,12 @@ const updateTaskSwimLane = async (req, res) => {
 
 const deleteKanbanBoardTaskComment = async (req, res) => {
     try {
-        const { commentId, taskId } = req.body;
+        const { taskId } = req.params;
+        const { commentId } = req.body;
+
+        console.log("commentId", commentId);
+        console.log("taskId", taskId);
+        
 
         if (!mongoose.Types.ObjectId.isValid(taskId)) {
             return res.status(404).json({ success: false, message: "Kanban board task not found!" });
