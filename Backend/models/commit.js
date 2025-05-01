@@ -23,7 +23,7 @@ const commitSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['approved', 'pending'],
+        enum: ['approved', 'pending', 'rejected'],
         default: 'pending',
         required: true
     },

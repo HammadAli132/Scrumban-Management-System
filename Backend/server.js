@@ -15,6 +15,7 @@ const sprintRouter = require("./routes/sprintRoutes.js");
 const collaboratorRouter = require("./routes/collaboratorRoutes.js");
 const meetingNoteRouter = require("./routes/meetingNoteRoutes.js");
 const kanbanBoardRouter = require("./routes/kanbanBoardRoutes.js");
+const codeRepositoryRouter = require("./routes/codeRepositoryRoutes.js")
 
 dotenv.config();
 const app = express();
@@ -35,6 +36,7 @@ app.use("/api/v1/sprints", sprintRouter);
 app.use("/api/v1/collaborators", collaboratorRouter);
 app.use("/api/v1/meeting-notes", meetingNoteRouter);
 app.use("/api/v1/kanban", kanbanBoardRouter);
+app.use("/api/v1/code-repository", codeRepositoryRouter);
 
 app.get('/', (req, res) => {
 	res.send('Hello World!');
@@ -44,7 +46,7 @@ app.listen(PORT, () => {
 	try {
 		mongoose.connect("mongodb://localhost:27017/scrumbandb");
 		console.log(`Connected to MongoDB`);
-		//initDB();
+		initDB();
 		console.log(`Server is running at http://localhost:${PORT}`);
 
 	} catch (error) {
