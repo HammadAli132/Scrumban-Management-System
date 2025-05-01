@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import avatar from '../assets/avatar-659651_640.png';
 import { BellDot, CircleEllipsis, Kanban, LayoutDashboard, ListTodo, FolderGit2, PanelsTopLeft } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
+import axios from 'axios';
+
+const apiUrl = import.meta.env.VITE_API_URL
 
 const Icons = [
     { icon: LayoutDashboard, route: '/' },
@@ -15,8 +18,30 @@ export default function NavigationBar() {
     const [activeIcon, setActiveIcon] = React.useState(0);
     const { projectid } = useParams();
     const projectIdState = useLocation().state?.projectId || null;
+    const [kanbanId, setKanbanId] = React.useState(null);
+    const [repoId, setRepoId] = React.useState(null);
 
     const location = useLocation();
+
+    // Fetch the kanbanId and repoId when the component mounts or when projectid changes
+    useEffect(() => {
+        const fetchKanbanId = async () => {
+            try {
+                const response = await axios.get(`${apiUrl}/kanban/kanbanId/${projectid}`);
+                const data = response.data;
+                if (data.success) {
+                    setKanbanId(data.kanbanBoardId);
+                } else {
+                    console.error('Failed to fetch kanbanId:', data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching kanbanId:', error);
+            }
+        }
+
+        fetchKanbanId();
+
+    }, [projectid]);
     React.useEffect(() => {
         const currentPath = location.pathname;
         let iconIndex = 0;
@@ -78,9 +103,9 @@ export default function NavigationBar() {
                     </Link>
                 )}
                 {/* Kanban Icon (conditionally shown) */}
-                {(projectid || projectIdState) && (
+                {((projectid || projectIdState) && kanbanId ) && (
                     <Link
-                        to={`/project/${(projectid || projectIdState)}/kanban/2`}
+                        to={`/project/${(projectid || projectIdState)}/kanban/${kanbanId}`}
                         className="cursor-pointer hover:bg-[#2f2f2f] rounded-lg p-1 flex items-center justify-center"
                         onClick={() => setActiveIcon(3)}
                     >

@@ -128,7 +128,7 @@ const getKanbanBoardId = async (req, res) => {
 
         const kanbanBoardId = await getKanbanBoardIdByProjectId(projectId);
 
-        res.status(200).json({ success: true, data: { kanbanBoardId } });
+        res.status(200).json({ success: true, kanbanBoardId });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
