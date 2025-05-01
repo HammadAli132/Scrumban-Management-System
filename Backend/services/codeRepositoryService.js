@@ -31,21 +31,21 @@ const getAllCommitsByRepositoryId = async (repoId) => {
     }
 };
 
-const updateCommitStatusByCommitId = async (commitId, status) => {
+const updateCommitStatusByCommitId = async (commitId, updatedStatus) => {
     try {
         if (!commitId) {
             throw new Error("Commit ID is required");
         }
 
-        if (status == 'rejected') {
-            const deletedCommit = await Commit.findByIdAndDelete({ _id: commitId });
+        if (updatedStatus == 'rejected') {
+            const deletedCommit = await Commit.findByIdAndDelete(commitId);
 
             return deletedCommit;
         }
 
         const updatedCommit = await Commit.findByIdAndUpdate(
-            { _id: commitId },
-            { status: status },
+            {_id: commitId},
+            { status: updatedStatus },
             { new: true }
         );
 

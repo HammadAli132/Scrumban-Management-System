@@ -9,3 +9,5 @@ const { getCodeRepositoryId,
 router.get("/repoId/:projectId", getCodeRepositoryId);
 router.get("/commits/:repoId", getAllCommits);
 router.put("/commit/:commitId", updateCommitStatus);
+
+module.exports = router;

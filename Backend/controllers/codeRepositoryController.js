@@ -1,6 +1,8 @@
+const mongoose = require('mongoose');
+
 const { getCodeRepositoryIdByProjectId,
-        getAllCommitsByRepositoryId,
-        updateCommitStatusByCommitId} = require('../services/codeRepositoryService')
+    getAllCommitsByRepositoryId,
+    updateCommitStatusByCommitId } = require('../services/codeRepositoryService')
 
 const getCodeRepositoryId = async (req, res) => {
     try {
@@ -42,7 +44,9 @@ const updateCommitStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: "Commit not found!" });
         }
 
-        const updatedCommit = await updateCommitStatusByCommitId(commitId);
+        const { updatedStatus } = req.body;
+
+        const updatedCommit = await updateCommitStatusByCommitId(commitId, updatedStatus);
 
         res.status(200).json({ success: true, updatedCommit });
     } catch (error) {
