@@ -195,13 +195,23 @@ export default function KanbanBoard() {
     setSelectedTask(task);
   };
 
-  const handleTaskUpdate = (updatedTask) => {
-    setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t));
+  const handleTaskUpdate = async (updatedTask) => {
+    try {
+      await axios.put(`${apiUrl}/kanban/kanbantask/${updatedTask.id}`, updatedTask);
+      setChanged(!changed); 
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
     setSelectedTask(null);
   };
 
-  const handleTaskDelete = (taskId) => {
-    setTasks(tasks.filter(t => t.id !== taskId));
+  const handleTaskDelete = async (taskId) => {
+    try {
+      await axios.delete(`${apiUrl}/kanban/kanbantask/${taskId}`);
+      setChanged(!changed); 
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
     setSelectedTask(null);
   };
 
@@ -306,6 +316,7 @@ export default function KanbanBoard() {
           onClose={() => setSelectedTask(null)}
           onUpdate={handleTaskUpdate}
           onDelete={handleTaskDelete}
+          sprints={sprints}
         />
       )}
     </div>

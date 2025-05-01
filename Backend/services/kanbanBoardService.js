@@ -65,14 +65,13 @@ const createKanbanBoardTaskByProjectId = async (projectId, taskData) => {
 
         const kanbanBoardId = kanbanBoard._id;
 
-        const newTask = await KanbanBoardTask.create(
+        const newTask = await KanbanBoardTask.create({
             ...taskData,
             kanbanBoardId
-        );
+        });
 
         return newTask;
     } catch (error) {
-        console.log(error.message);
         
         throw new Error("Error creating kanban board task: " + error.message);
     }

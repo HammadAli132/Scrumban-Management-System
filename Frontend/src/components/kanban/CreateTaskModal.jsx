@@ -25,7 +25,6 @@ export default function CreateTaskModal({ onClose, onCreate, columnId, sprints =
       swimLane: task.status,
       sprintId: task.sprintId,
       userId: user.id,
-      kanbanBoardId: kanbanid,
     });
     onClose();
   };

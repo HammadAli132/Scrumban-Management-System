@@ -95,13 +95,7 @@ const updateKanbanBoardTask = async (req, res) => {
         } = req.body;
 
         const updateData = {
-            ...(title != undefined && { title }),
-            ...(description != undefined && { description }),
-            ...(priorityLevel != undefined && { priorityLevel }),
-            ...(dueDate != undefined && { dueDate }),
-            ...(swimLane != undefined && { swimLane }),
-            ...(sprintId != undefined && { sprintId }),
-            ...(userId != undefined && { userId })
+            title, description, priorityLevel, dueDate, swimLane, sprintId, userId
         };
 
         const updatedTask = await updateKanbanBoardTaskById(taskId, updateData);
