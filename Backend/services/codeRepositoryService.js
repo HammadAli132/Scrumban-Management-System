@@ -1,4 +1,5 @@
 const CodeRepository = require('../models/codeRepository');
+const Commit = require('../models/commit');
 
 const getCodeRepositoryIdByProjectId = async (projectId) => {
     try {
@@ -14,6 +15,23 @@ const getCodeRepositoryIdByProjectId = async (projectId) => {
     }
 };
 
+const getAllCommitsByRepositoryId = async (repoId) => {
+    try {
+        if (!repoId) {
+            throw new Error("Repository ID is required");
+        }
+
+        // Get all commits for the repository, sorted by timestamp (newest first)
+        const commits = await Commit.find({ repositoryId: repoId })
+            .sort({ timestamp: -1 }); // -1 for descending (newest first)
+
+        return commits;
+    } catch (error) {
+        throw new Error(`Error getting commits in repository: ${error.message}`);
+    }
+}
+
 model.exports = {
-    getCodeRepositoryIdByProjectId
+    getCodeRepositoryIdByProjectId,
+    getAllCommitsByRepositoryId
 }
