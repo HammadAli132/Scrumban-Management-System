@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Bell, Menu, X, LogOut } from 'lucide-react';
 import axios from "axios"
 import { useLocation } from 'react-router-dom';
+import { getInitials, getAvatarColor } from '../../../utils/avatarUtils';
 const apiUrl = import.meta.env.VITE_API_URL
 
 function Navbar() {
@@ -10,6 +11,9 @@ function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState([]);
+
+  const initials = getInitials(user.name);
+  const avatarColor = getAvatarColor(user.name);
 
   useEffect(() => {
     const getNotifications = async () => {
@@ -142,8 +146,8 @@ function Navbar() {
           {/* User dropdown */}
           <div className="ml-4 relative flex-shrink-0">
             <div className="group relative">
-              <div className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white font-medium cursor-pointer">
-                JS
+              <div style={{ backgroundColor: avatarColor }} className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-medium cursor-pointer`}>
+                {initials}
               </div>
             </div>
           </div>
