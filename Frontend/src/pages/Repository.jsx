@@ -333,6 +333,24 @@ export default function Repository() {
     }
   }
 
+  const changeCommitStatus = async (commitId, newStatus) => {
+    try {
+      const response = await axios.put(`${apiUrl}/code-repository/commit/${commitId}`, { updatedStatus: newStatus });
+      if (response.data.success) {
+        if (newStatus === 'rejected') {
+          setCommits((prev) => prev.filter(commit => commit._id !== commitId));
+        }
+        else 
+          setCommits((prev) => prev.map(commit => commit._id === commitId ? { ...commit, status: newStatus } : commit));
+      } else {
+        console.error('Error updating commit status:', response.data.message);
+      }
+
+    } catch (error) {
+      console.error('Error updating commit status:', error.message);
+    }
+  };
+
   useEffect(() => {
     const initializeData = async () => {
       await checkIfUserIsProjectOwner();
@@ -378,13 +396,9 @@ export default function Repository() {
     await createCommit();
   };
 
-  const handleStatusChange = (commitId, newStatus) => {
+  const handleStatusChange = async (commitId, newStatus) => {
     // In a real app, you would call your API to update the status
-    setCommits(
-      commits.map(commit =>
-        commit._id === commitId ? { ...commit, status: newStatus } : commit
-      )
-    );
+    await changeCommitStatus(commitId, newStatus);
   };
 
   const toggleFileDetails = (commitId) => {
@@ -661,8 +675,8 @@ export default function Repository() {
                     type="submit"
                     disabled={isUploading || !commitMessage.trim()}
                     className={`px-4 py-2 rounded-lg bg-blue-600 text-white flex items-center gap-2 ${isUploading || !commitMessage.trim()
-                        ? 'opacity-50 cursor-not-allowed'
-                        : 'hover:bg-blue-700'
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'hover:bg-blue-700'
                       } transition-colors`}
                   >
                     {isUploading ? (
