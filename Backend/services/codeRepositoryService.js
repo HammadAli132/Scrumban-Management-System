@@ -66,8 +66,19 @@ const updateCommitStatusByCommitId = async (commitId, updatedStatus) => {
     }
 };
 
+const createCommit = async (commitData) => {
+    try {
+        const newCommit = new Commit(commitData);
+        await newCommit.save();
+        return newCommit;
+    } catch (error) {
+        throw new Error(`Error creating commit: ${error.message}`);
+    }
+};
+
 module.exports = {
     getCodeRepositoryIdByProjectId,
     getAllCommitsByRepositoryId,
-    updateCommitStatusByCommitId
+    updateCommitStatusByCommitId,
+    createCommit
 }

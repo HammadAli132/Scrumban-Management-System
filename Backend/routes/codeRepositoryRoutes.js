@@ -4,10 +4,13 @@ const router = express.Router();
 
 const { getCodeRepositoryId,
         getAllCommits, 
-        updateCommitStatus} = require("../controllers/codeRepositoryController");
+        updateCommitStatus,
+        addCommit
+    } = require("../controllers/codeRepositoryController");
 
 router.get("/repoId/:projectId", getCodeRepositoryId);
 router.get("/commits/:repoId", getAllCommits);
 router.put("/commit/:commitId", updateCommitStatus);
+router.post("/commit/:repoId", addCommit);
 
 module.exports = router;

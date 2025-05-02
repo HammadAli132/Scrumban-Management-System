@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  GitBranch, 
-  GitCommit, 
-  FileCode, 
-  Folder, 
+import {
+  ArrowLeft,
+  GitBranch,
+  GitCommit,
+  FileCode,
+  Folder,
   ChevronRight,
   Upload,
   Check,
@@ -21,7 +21,7 @@ import {
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css'; // Import a syntax highlighting theme
 import axios from 'axios';
-const apiUrl = import.meta.env.VITE_API_URL; 
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // Define sample data (in a real app, you would fetch this from your API)
 const sampleRepositories = [
@@ -100,33 +100,33 @@ const getLanguageFromFileName = (fileName) => {
     swift: 'swift',
     kt: 'kotlin'
   };
-  
+
   return extensionMap[extension] || 'plaintext';
 };
 
 // Helper function to format date
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric', 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   });
 };
 
 // File preview component with syntax highlighting
 const FilePreview = ({ file, language }) => {
   const codeRef = useRef(null);
-  
+
   useEffect(() => {
     if (codeRef.current && file) {
-      const highlightedCode = hljs.highlight(file, { 
+      const highlightedCode = hljs.highlight(file, {
         language: language || 'plaintext',
-        ignoreIllegals: true 
+        ignoreIllegals: true
       }).value;
-      
+
       codeRef.current.innerHTML = highlightedCode;
     }
   }, [file, language]);
@@ -153,7 +153,7 @@ const StatusBadge = ({ status }) => {
         return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
     }
   };
-  
+
   const getStatusIcon = () => {
     switch (status) {
       case 'approved':
@@ -275,10 +275,11 @@ export default function Repository() {
   const [showFileDetails, setShowFileDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isProjectOwner, setIsProjectOwner] = useState(false);
-  
+  const [changed, setChanged] = useState(false);
+
   // In real app, you'd fetch this from your API based on logged in user
   const user = JSON.parse(localStorage.getItem('user'));
-  
+
   // Check if user is the project owner (in real app, fetch project details and check)
   const checkIfUserIsProjectOwner = async () => {
     try {
@@ -299,7 +300,7 @@ export default function Repository() {
       if (response.data.success) {
         setCommits(response.data.commits);
         console.log(response.data.commits);
-        
+
       } else {
         console.error('Error fetching commits:', response.data.message);
       }
@@ -308,6 +309,29 @@ export default function Repository() {
     }
   }
 
+  const createCommit = async () => {
+    try {
+      const response = await axios.post(`${apiUrl}/code-repository/commit/${repositoryid}`, {
+        message: commitMessage,
+        fileName: fileToUpload.name,
+        fileContent: filePreview,
+        status: 'pending',
+        userId: user.id
+      });
+      if (response.data.success) {
+        setIsUploading(false);
+        setShowUploadModal(false);
+        setFileToUpload(null);
+        setFilePreview('');
+        setCommitMessage('');
+        setChanged((prev) => !prev);
+      } else {
+        console.error('Error creating commit:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error creating commit:', error.message);
+    }
+  }
 
   useEffect(() => {
     const initializeData = async () => {
@@ -319,59 +343,45 @@ export default function Repository() {
     initializeData();
   }, []);
 
-  
+  useEffect(() => {
+    const fetchCommits = async () => {
+      await getAllCommits();
+    }
+    fetchCommits();
+  }, [changed]);
+
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    
+
     setFileToUpload(file);
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       const content = e.target?.result;
       setFilePreview(content);
       const language = getLanguageFromFileName(file.name);
       setFileLanguage(language);
     };
-    
+
     reader.readAsText(file);
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     e.preventDefault();
-    
+
     if (!fileToUpload || !commitMessage.trim()) return;
-    
+
     setIsUploading(true);
-    
-    // Simulating upload delay
-    setTimeout(() => {
-      const newCommit = {
-        _id: Math.random().toString(36).substring(2, 15),
-        message: commitMessage,
-        hash: Math.random().toString(36).substring(2, 10),
-        fileName: fileToUpload.name,
-        fileContent: filePreview,
-        status: 'pending',
-        userId: user._id,
-        repositoryId: currentRepository._id,
-        createdAt: new Date().toISOString()
-      };
-      
-      setCommits([newCommit, ...commits]);
-      setIsUploading(false);
-      setShowUploadModal(false);
-      setFileToUpload(null);
-      setFilePreview('');
-      setCommitMessage('');
-    }, 1000);
+
+    await createCommit();
   };
 
   const handleStatusChange = (commitId, newStatus) => {
     // In a real app, you would call your API to update the status
     setCommits(
-      commits.map(commit => 
+      commits.map(commit =>
         commit._id === commitId ? { ...commit, status: newStatus } : commit
       )
     );
@@ -390,7 +400,7 @@ export default function Repository() {
     const styleElement = document.createElement('style');
     styleElement.textContent = syntaxHighlightingStyles;
     document.head.appendChild(styleElement);
-    
+
     return () => {
       document.head.removeChild(styleElement);
     };
@@ -417,14 +427,14 @@ export default function Repository() {
               <div className="flex items-center gap-2">
                 <GitCommit size={16} className="text-gray-400" />
                 <span className="text-gray-400">
-                  {commits.length > 0 
-                    ? `Last commit: ${formatDate(commits[0].createdAt)}` 
+                  {commits.length > 0
+                    ? `Last commit: ${formatDate(commits[0].createdAt)}`
                     : 'No commits yet'}
                 </span>
               </div>
             </div>
           </div>
-          
+
           <button
             onClick={() => setShowUploadModal(true)}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg"
@@ -474,14 +484,14 @@ export default function Repository() {
                       <div className="text-sm text-gray-400 mt-0.5">{commit.message}</div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between md:justify-end gap-4">
                     <StatusBadge status={commit.status} />
-                    
+
                     <div className="text-sm text-gray-400">
                       {formatDate(commit.createdAt)}
                     </div>
-                    
+
                     {isProjectOwner && commit.status === 'pending' && (
                       <div className="flex items-center gap-2 ml-2">
                         <button
@@ -508,7 +518,7 @@ export default function Repository() {
                     )}
                   </div>
                 </div>
-                
+
                 {/* File preview when expanded */}
                 {showFileDetails === commit._id && (
                   <div className="px-6 py-4 bg-[#151515] border-t border-[#2e2d2d]">
@@ -516,12 +526,12 @@ export default function Repository() {
                       <Code size={16} className="text-gray-400" />
                       <span className="text-sm font-medium text-gray-300">File Content</span>
                     </div>
-                    <FilePreview 
-                      file={commit.fileContent} 
-                      language={getLanguageFromFileName(commit.fileName)} 
+                    <FilePreview
+                      file={commit.fileContent}
+                      language={getLanguageFromFileName(commit.fileName)}
                     />
                     <div className="mt-4 flex items-center gap-3 text-sm text-gray-400">
-                      <span className="font-mono">#{commit.hash}</span>
+                      <span className="font-mono">{commit.hash}</span>
                       <span>•</span>
                       <span>By User {commit.userId.username}</span>
                     </div>
@@ -551,10 +561,10 @@ export default function Repository() {
                 <X size={20} />
               </button>
             </div>
-            
+
             <form onSubmit={handleFileUpload} className="p-6">
               {!fileToUpload ? (
-                <div 
+                <div
                   className="border-2 border-dashed border-[#2e2d2d] rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer bg-[#161616]"
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
@@ -600,7 +610,7 @@ export default function Repository() {
                         <X size={16} />
                       </button>
                     </div>
-                    
+
                     <div className="bg-[#0d1117] rounded-lg border border-[#30363d] overflow-hidden">
                       <div className="bg-[#161b22] border-b border-[#30363d] px-4 py-2 flex items-center">
                         <div className="rounded-full w-3 h-3 bg-red-500 mr-2"></div>
@@ -615,7 +625,7 @@ export default function Repository() {
                       <span>{fileToUpload.size} bytes</span>
                     </div>
                   </div>
-                  
+
                   <div className="mb-6">
                     <label htmlFor="commit-message" className="block text-gray-300 mb-2 font-medium">
                       Commit Message
@@ -632,7 +642,7 @@ export default function Repository() {
                   </div>
                 </>
               )}
-              
+
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   type="button"
@@ -650,11 +660,10 @@ export default function Repository() {
                   <button
                     type="submit"
                     disabled={isUploading || !commitMessage.trim()}
-                    className={`px-4 py-2 rounded-lg bg-blue-600 text-white flex items-center gap-2 ${
-                      isUploading || !commitMessage.trim()
+                    className={`px-4 py-2 rounded-lg bg-blue-600 text-white flex items-center gap-2 ${isUploading || !commitMessage.trim()
                         ? 'opacity-50 cursor-not-allowed'
                         : 'hover:bg-blue-700'
-                    } transition-colors`}
+                      } transition-colors`}
                   >
                     {isUploading ? (
                       <>
