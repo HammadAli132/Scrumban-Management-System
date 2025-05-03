@@ -12,8 +12,13 @@ function Navbar() {
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState([]);
 
-  const initials = getInitials(user.name);
-  const avatarColor = getAvatarColor(user.name);
+  let initials = null;
+  let avatarColor = null;
+
+  if (user) {
+    initials = getInitials(user.name);
+    avatarColor = getAvatarColor(user.name);
+  }
 
   useEffect(() => {
     const getNotifications = async () => {
